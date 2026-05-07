@@ -188,6 +188,89 @@
       </main>
     </section><!-- /upload-screen -->
 
+    <!-- ===== TELA 3: VISUALIZAÇÃO POR CATEGORIA ===== -->
+    <section id="category-screen" class="screen category-screen is-hidden">
+
+      <!-- Header -->
+      <header class="category-header">
+        <div class="container">
+          <span class="logo">Cadê?</span>
+        </div>
+      </header>
+
+      <!-- Conteúdo principal -->
+      <main class="category-main container">
+
+        <!-- Navegação de retorno -->
+        <nav class="category-nav" aria-label="Navegação">
+          <button id="btn-category-back" type="button" class="btn-back-link">
+            ← Voltar
+          </button>
+        </nav>
+
+        <!-- Intro -->
+        <div class="category-intro">
+          <h1 class="category-intro__title">Arquivos por categoria</h1>
+          <p class="category-intro__subtitle">
+            Categoria selecionada:
+            <span id="category-name-display" class="category-intro__name">Pessoal</span>
+          </p>
+        </div>
+
+        <!-- Resumo da categoria -->
+        <div class="category-summary">
+          <span class="category-summary__icon" id="category-summary-icon" aria-hidden="true">🏠</span>
+          <div class="category-summary__info">
+            <span class="category-summary__label" id="category-summary-label">Pessoal</span>
+            <span class="category-summary__count" id="category-summary-count">3 arquivos</span>
+          </div>
+        </div>
+
+        <!-- Toolbar: Filtro + Ordenação -->
+        <div class="category-toolbar">
+          <div class="category-filter">
+            <div class="search-bar">
+              <input
+                type="search"
+                id="category-filter-input"
+                class="search-bar__input"
+                placeholder="Filtrar nesta categoria"
+                aria-label="Filtrar arquivos nesta categoria"
+              />
+            </div>
+          </div>
+          <div class="sort-group">
+            <label class="form-label" for="sort-select">Ordenar por</label>
+            <div class="sort-select-wrapper">
+              <select id="sort-select" class="sort-select">
+                <option value="recent">Mais recentes</option>
+                <option value="name">Nome A-Z</option>
+                <option value="type">Tipo de arquivo</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Lista de arquivos (preenchida pelo JS) -->
+        <div class="file-list" id="file-list" role="list" aria-label="Arquivos da categoria"></div>
+
+        <!-- Estado vazio do filtro -->
+        <div class="empty-filter-state is-hidden" id="empty-filter-state" role="status">
+          <div class="empty-filter-state__icon" aria-hidden="true">🔍</div>
+          <p class="empty-filter-state__title">Nenhum arquivo encontrado nesta categoria</p>
+          <p class="empty-filter-state__subtitle">Tente buscar por outro nome, tipo ou etiqueta</p>
+        </div>
+
+        <!-- Ação -->
+        <div class="category-actions">
+          <button id="btn-add-new" type="button" class="btn btn-primary btn-full">
+            + Adicionar novo arquivo
+          </button>
+        </div>
+
+      </main>
+    </section><!-- /category-screen -->
+
     <!-- JS -->
     <script src="src/js/main.js"></script>
   </body>
