@@ -1,5 +1,5 @@
 /* ============================================
-   main.js — Lógica do protótipo Cadê?
+   main.js — Cadê? | IndexedDB CRUD
    ============================================ */
 
 console.log('[Cadê?] Protótipo carregado com sucesso.');
@@ -8,7 +8,9 @@ console.log('[Cadê?] Protótipo carregado com sucesso.');
 //  CONFIGURAÇÃO
 // ══════════════════════════════════════════════
 
-const STORAGE_KEY = 'cade_files';
+const DB_NAME    = 'cade_db';
+const DB_VERSION = 1;
+const STORE_NAME = 'files';
 
 const CATEGORIES = {
   pessoal:   { label: 'Pessoal',   icon: '🏠' },
@@ -17,64 +19,111 @@ const CATEGORIES = {
 };
 
 // ══════════════════════════════════════════════
-//  CRUD — LocalStorage
+//  INDEXEDDB — Funções de acesso
 // ══════════════════════════════════════════════
 
-function getFiles() {
-  try {
-    return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-  } catch {
-    return [];
-  }
+let db = null;
+
+function openDatabase() {
+  return new Promise((resolve, reject) => {
+    if (db) { resolve(db); return; }
+    const req = indexedDB.open(DB_NAME, DB_VERSION);
+    req.onupgradeneeded = e => {
+      const database = e.target.result;
+      if (!database.objectStoreNames.contains(STORE_NAME)) {
+        database.createObjectStore(STORE_NAME, { keyPath: 'id' });
+      }
+    };
+    req.onsuccess = e => {
+      db = e.target.result;
+      resolve(db);
+    };
+    req.onerror = e => reject(e.target.error);
+  });
 }
 
-function saveFiles(files) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(files));
+function addFileRecord(fileData) {
+  return new Promise((resolve, reject) => {
+    const tx     = db.transaction(STORE_NAME, 'readwrite');
+    const store  = tx.objectStore(STORE_NAME);
+    const now    = new Date().toISOString();
+    const record = {
+      id:               generateId(),
+      displayName:      fileData.displayName.trim(),
+      originalFileName: fileData.originalFileName,
+      fileType:         fileData.fileType,
+      mimeType:         fileData.mimeType || '',
+      fileSize:         fileData.fileSize || 0,
+      category:         fileData.category,
+      tag:              fileData.tag ? fileData.tag.trim() : '',
+      blob:             fileData.blob,
+      createdAt:        now,
+      updatedAt:        now,
+    };
+    const req   = store.add(record);
+    req.onsuccess = () => { console.log('[Cadê?] Arquivo salvo:', record.displayName); resolve(record); };
+    req.onerror   = e => reject(e.target.error);
+  });
 }
 
-function createFile(fileData) {
-  const files = getFiles();
-  const now   = new Date().toISOString();
-  const newFile = {
-    id:               generateId(),
-    displayName:      fileData.displayName.trim(),
-    originalFileName: fileData.originalFileName,
-    fileType:         fileData.fileType,
-    category:         fileData.category,
-    tag:              fileData.tag ? fileData.tag.trim() : '',
-    createdAt:        now,
-    updatedAt:        now,
-  };
-  files.unshift(newFile);
-  saveFiles(files);
-  console.log('[Cadê?] Arquivo criado:', newFile.displayName);
-  return newFile;
+function getAllFileRecords() {
+  return new Promise((resolve, reject) => {
+    const tx    = db.transaction(STORE_NAME, 'readonly');
+    const store = tx.objectStore(STORE_NAME);
+    const req   = store.getAll();
+    req.onsuccess = e => resolve(e.target.result || []);
+    req.onerror   = e => reject(e.target.error);
+  });
 }
 
-function updateFile(id, updatedData) {
-  const files = getFiles();
-  const idx   = files.findIndex(f => f.id === id);
-  if (idx === -1) return null;
-  files[idx] = {
-    ...files[idx],
-    displayName: updatedData.displayName.trim(),
-    category:    updatedData.category,
-    tag:         updatedData.tag ? updatedData.tag.trim() : '',
-    updatedAt:   new Date().toISOString(),
-  };
-  saveFiles(files);
-  console.log('[Cadê?] Arquivo atualizado:', files[idx].displayName);
-  return files[idx];
+function getFileRecordById(id) {
+  return new Promise((resolve, reject) => {
+    const tx    = db.transaction(STORE_NAME, 'readonly');
+    const store = tx.objectStore(STORE_NAME);
+    const req   = store.get(id);
+    req.onsuccess = e => resolve(e.target.result || null);
+    req.onerror   = e => reject(e.target.error);
+  });
 }
 
-function deleteFile(id) {
-  const files = getFiles().filter(f => f.id !== id);
-  saveFiles(files);
-  console.log('[Cadê?] Arquivo excluído:', id);
+function updateFileRecord(id, updatedData) {
+  return new Promise((resolve, reject) => {
+    const tx     = db.transaction(STORE_NAME, 'readwrite');
+    const store  = tx.objectStore(STORE_NAME);
+    const getReq = store.get(id);
+    getReq.onsuccess = e => {
+      const existing = e.target.result;
+      if (!existing) { reject(new Error('Registro não encontrado.')); return; }
+      const updated = {
+        ...existing,
+        displayName: updatedData.displayName.trim(),
+        category:    updatedData.category,
+        tag:         updatedData.tag ? updatedData.tag.trim() : '',
+        updatedAt:   new Date().toISOString(),
+      };
+      if (updatedData.blob) {
+        updated.originalFileName = updatedData.originalFileName;
+        updated.fileType         = updatedData.fileType;
+        updated.mimeType         = updatedData.mimeType || '';
+        updated.fileSize         = updatedData.fileSize || 0;
+        updated.blob             = updatedData.blob;
+      }
+      const putReq    = store.put(updated);
+      putReq.onsuccess = () => { console.log('[Cadê?] Arquivo atualizado:', updated.displayName); resolve(updated); };
+      putReq.onerror   = e2 => reject(e2.target.error);
+    };
+    getReq.onerror = e => reject(e.target.error);
+  });
 }
 
-function getFileById(id) {
-  return getFiles().find(f => f.id === id) || null;
+function deleteFileRecord(id) {
+  return new Promise((resolve, reject) => {
+    const tx    = db.transaction(STORE_NAME, 'readwrite');
+    const store = tx.objectStore(STORE_NAME);
+    const req   = store.delete(id);
+    req.onsuccess = () => { console.log('[Cadê?] Arquivo excluído:', id); resolve(); };
+    req.onerror   = e => reject(e.target.error);
+  });
 }
 
 // ══════════════════════════════════════════════
@@ -90,8 +139,8 @@ function detectFileType(file) {
   const ext  = file.name.split('.').pop().toLowerCase();
   if (mime.startsWith('image/') || ['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg'].includes(ext)) return 'imagem';
   if (mime === 'application/pdf' || ext === 'pdf')   return 'pdf';
-  if (['doc', 'docx'].includes(ext) || mime.includes('word'))                                  return 'docx';
-  if (['xls', 'xlsx'].includes(ext) || mime.includes('spreadsheet') || mime.includes('excel')) return 'xlsx';
+  if (['doc', 'docx'].includes(ext) || mime.includes('word'))                                   return 'docx';
+  if (['xls', 'xlsx'].includes(ext) || mime.includes('spreadsheet') || mime.includes('excel'))  return 'xlsx';
   if (['ppt', 'pptx'].includes(ext) || mime.includes('presentation') || mime.includes('powerpoint')) return 'pptx';
   if (ext === 'txt' || mime === 'text/plain') return 'txt';
   return ext || 'arquivo';
@@ -102,6 +151,14 @@ function formatDate(isoString) {
   return new Date(isoString).toLocaleDateString('pt-BR');
 }
 
+function formatFileSize(bytes) {
+  if (!bytes || bytes === 0) return '';
+  if (bytes < 1024)              return `${bytes} B`;
+  if (bytes < 1024 * 1024)       return `${(bytes / 1024).toFixed(1)} KB`;
+  if (bytes < 1024 * 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  return `${(bytes / (1024 * 1024 * 1024)).toFixed(1)} GB`;
+}
+
 function escapeHTML(str) {
   if (str == null) return '';
   return String(str)
@@ -109,6 +166,51 @@ function escapeHTML(str) {
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;');
+}
+
+// ══════════════════════════════════════════════
+//  ABRIR ARQUIVO
+// ══════════════════════════════════════════════
+
+async function openStoredFile(id) {
+  try {
+    const record = await getFileRecordById(id);
+    if (!record || !record.blob) {
+      console.warn('[Cadê?] Arquivo não encontrado no banco.');
+      return;
+    }
+    const blob = record.blob instanceof Blob ? record.blob : new Blob([record.blob], { type: record.mimeType || 'application/octet-stream' });
+    const url  = URL.createObjectURL(blob);
+    const win  = window.open(url, '_blank');
+    setTimeout(() => URL.revokeObjectURL(url), 30000);
+    if (!win) {
+      // Popup bloqueado — fallback para download
+      await downloadStoredFile(id);
+    }
+  } catch (err) {
+    console.error('[Cadê?] Erro ao abrir arquivo:', err);
+  }
+}
+
+async function downloadStoredFile(id) {
+  try {
+    const record = await getFileRecordById(id);
+    if (!record || !record.blob) {
+      console.warn('[Cadê?] Arquivo não encontrado no banco.');
+      return;
+    }
+    const blob = record.blob instanceof Blob ? record.blob : new Blob([record.blob], { type: record.mimeType || 'application/octet-stream' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href     = url;
+    a.download = record.originalFileName || record.displayName;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 5000);
+  } catch (err) {
+    console.error('[Cadê?] Erro ao baixar arquivo:', err);
+  }
 }
 
 // ══════════════════════════════════════════════
@@ -138,17 +240,21 @@ const btnAddFile       = document.getElementById('btn-add-file');
 const searchInput      = document.getElementById('search-input');
 const categoryCards    = document.querySelectorAll('.category-card');
 
-function renderHomeState() {
-  const files = getFiles();
-  if (files.length === 0) {
-    emptyState.classList.remove('is-hidden');
-    homeFilesSummary.classList.add('is-hidden');
-  } else {
-    emptyState.classList.add('is-hidden');
-    homeFilesSummary.classList.remove('is-hidden');
-    const n = files.length;
-    homeFilesSummary.querySelector('.home-summary__text').textContent =
-      `Você tem ${n} arquivo${n !== 1 ? 's' : ''} salvo${n !== 1 ? 's' : ''}`;
+async function renderHomeState() {
+  try {
+    const files = await getAllFileRecords();
+    if (files.length === 0) {
+      emptyState.classList.remove('is-hidden');
+      homeFilesSummary.classList.add('is-hidden');
+    } else {
+      emptyState.classList.add('is-hidden');
+      homeFilesSummary.classList.remove('is-hidden');
+      const n = files.length;
+      homeFilesSummary.querySelector('.home-summary__text').textContent =
+        `Você tem ${n} arquivo${n !== 1 ? 's' : ''} salvo${n !== 1 ? 's' : ''}`;
+    }
+  } catch (err) {
+    console.error('[Cadê?] Erro ao carregar estado da home:', err);
   }
 }
 
@@ -181,7 +287,7 @@ const filenameText          = document.getElementById('filename-text');
 const fileNameInput         = document.getElementById('file-name');
 const fileTagInput          = document.getElementById('file-tag');
 const uploadCategoryOpts    = document.querySelectorAll('.category-option');
-const btnSave               = document.getElementById('btn-save');
+const uploadForm            = document.getElementById('upload-form');
 const btnBack               = document.getElementById('btn-back');
 const successMessage        = document.getElementById('success-message');
 const uploadIntroTitle      = document.getElementById('upload-intro-title');
@@ -195,32 +301,35 @@ function openCreateMode() {
   resetUploadForm();
   uploadIntroTitle.textContent    = 'Adicionar arquivo';
   uploadIntroSubtitle.textContent = 'Envie um documento e organize-o por categoria';
-  btnSave.textContent             = 'Salvar arquivo';
   uploadAreaWrapper.classList.remove('is-hidden');
   editReferenceRow.classList.add('is-hidden');
   showScreen('upload');
 }
 
-function openEditMode(id) {
-  const file = getFileById(id);
-  if (!file) return;
-  editingFileId = id;
-  resetUploadForm();
-  uploadIntroTitle.textContent    = 'Editar arquivo';
-  uploadIntroSubtitle.textContent = 'Atualize as informações do arquivo';
-  btnSave.textContent             = 'Salvar alterações';
-  uploadAreaWrapper.classList.add('is-hidden');
-  editReferenceRow.classList.remove('is-hidden');
-  editReferenceFilename.textContent = file.originalFileName;
-  fileNameInput.value = file.displayName;
-  fileTagInput.value  = file.tag || '';
-  uploadCategoryOpts.forEach(opt => {
-    const match = opt.dataset.category === file.category;
-    opt.classList.toggle('is-selected', match);
-    opt.setAttribute('aria-checked', String(match));
-  });
-  selectedCategory = file.category;
-  showScreen('upload');
+async function openEditMode(id) {
+  try {
+    const file = await getFileRecordById(id);
+    if (!file) return;
+    editingFileId = id;
+    resetUploadForm();
+    uploadIntroTitle.textContent    = 'Editar arquivo';
+    uploadIntroSubtitle.textContent = 'Atualize as informações do arquivo';
+    // Mantém área de upload visível (arquivo novo é opcional em edição)
+    uploadAreaWrapper.classList.remove('is-hidden');
+    editReferenceRow.classList.remove('is-hidden');
+    editReferenceFilename.textContent = file.originalFileName;
+    fileNameInput.value = file.displayName;
+    fileTagInput.value  = file.tag || '';
+    uploadCategoryOpts.forEach(opt => {
+      const match = opt.dataset.category === file.category;
+      opt.classList.toggle('is-selected', match);
+      opt.setAttribute('aria-checked', String(match));
+    });
+    selectedCategory = file.category;
+    showScreen('upload');
+  } catch (err) {
+    console.error('[Cadê?] Erro ao abrir modo de edição:', err);
+  }
 }
 
 function resetUploadForm() {
@@ -241,12 +350,11 @@ function resetUploadForm() {
   document.querySelector('.category-options')?.classList.remove('is-error');
   document.querySelectorAll('.field-error').forEach(el => (el.textContent = ''));
   successMessage.classList.add('is-hidden');
-  btnSave.disabled = false;
 }
 
-btnBack.addEventListener('click', () => {
+btnBack.addEventListener('click', async () => {
   resetUploadForm();
-  renderHomeState();
+  await renderHomeState();
   showScreen('home');
 });
 
@@ -272,13 +380,18 @@ uploadCategoryOpts.forEach(option => {
     selectedCategory = option.dataset.category;
     document.querySelector('.category-options')?.classList.remove('is-error');
     document.getElementById('error-category').textContent = '';
+    // Auto-submit when category is chosen and name/file are already filled
+    const nameReady = fileNameInput.value.trim().length > 0;
+    const fileReady = !!editingFileId || !!selectedFile;
+    if (nameReady && fileReady) uploadForm.requestSubmit();
   });
 });
 
-btnSave.addEventListener('click', () => {
+uploadForm.addEventListener('submit', async e => {
+  e.preventDefault();
   let isValid = true;
 
-  // Validar: arquivo (apenas em modo criação)
+  // Validar: arquivo (obrigatório apenas em modo criação)
   if (!editingFileId && !selectedFile) {
     uploadArea.classList.add('is-error');
     document.getElementById('error-file').textContent = 'Selecione um arquivo para continuar.';
@@ -314,32 +427,49 @@ btnSave.addEventListener('click', () => {
 
   const targetCategory = selectedCategory;
 
-  if (editingFileId) {
-    updateFile(editingFileId, {
-      displayName,
-      category: selectedCategory,
-      tag: fileTagInput.value.trim(),
-    });
-    btnSave.textContent = 'Alterações salvas ✓';
-  } else {
-    createFile({
-      displayName,
-      originalFileName: selectedFile.name,
-      fileType:         detectFileType(selectedFile),
-      category:         selectedCategory,
-      tag:              fileTagInput.value.trim(),
-    });
-    btnSave.textContent = 'Arquivo salvo ✓';
+  try {
+    if (editingFileId) {
+      const updatedData = {
+        displayName,
+        category: selectedCategory,
+        tag: fileTagInput.value.trim(),
+      };
+      if (selectedFile) {
+        updatedData.originalFileName = selectedFile.name;
+        updatedData.fileType         = detectFileType(selectedFile);
+        updatedData.mimeType         = selectedFile.type;
+        updatedData.fileSize         = selectedFile.size;
+        updatedData.blob             = selectedFile;
+      }
+      await updateFileRecord(editingFileId, updatedData);
+
+    } else {
+      await addFileRecord({
+        displayName,
+        originalFileName: selectedFile.name,
+        fileType:         detectFileType(selectedFile),
+        mimeType:         selectedFile.type,
+        fileSize:         selectedFile.size,
+        category:         selectedCategory,
+        tag:              fileTagInput.value.trim(),
+        blob:             selectedFile,
+      });
+
+    }
+
+    successMessage.classList.remove('is-hidden');
+
+    setTimeout(async () => {
+      resetUploadForm();
+      await renderHomeState();
+      await openCategoryScreen(targetCategory);
+    }, 1200);
+
+  } catch (err) {
+    console.error('[Cadê?] Erro ao salvar arquivo:', err);
+    document.getElementById('error-file').textContent = 'Erro ao salvar o arquivo. Tente novamente.';
+
   }
-
-  successMessage.classList.remove('is-hidden');
-  btnSave.disabled = true;
-
-  setTimeout(() => {
-    resetUploadForm();
-    renderHomeState();
-    openCategoryScreen(targetCategory);
-  }, 1200);
 });
 
 // ══════════════════════════════════════════════
@@ -359,8 +489,8 @@ const emptyFilterState     = document.getElementById('empty-filter-state');
 const btnCategoryBack      = document.getElementById('btn-category-back');
 const btnAddNew            = document.getElementById('btn-add-new');
 
-btnCategoryBack.addEventListener('click', () => {
-  renderHomeState();
+btnCategoryBack.addEventListener('click', async () => {
+  await renderHomeState();
   showScreen('home');
 });
 
@@ -369,60 +499,65 @@ btnAddNew.addEventListener('click', () => openCreateMode());
 categoryFilterInput.addEventListener('input', () => renderCategoryFiles());
 sortSelect.addEventListener('change', () => renderCategoryFiles());
 
-function openCategoryScreen(category) {
+async function openCategoryScreen(category) {
   currentCategoryView       = category || 'pessoal';
   categoryFilterInput.value = '';
   sortSelect.value          = 'recent';
-  renderCategoryFiles();
   showScreen('category');
+  await renderCategoryFiles();
 }
 
-function renderCategoryFiles() {
-  const cat      = CATEGORIES[currentCategoryView] || { label: currentCategoryView, icon: '📁' };
-  const query    = categoryFilterInput.value.trim().toLowerCase();
-  const order    = sortSelect.value;
-  const allInCat = getFiles().filter(f => f.category === currentCategoryView);
-  let   files    = [...allInCat];
+async function renderCategoryFiles() {
+  try {
+    const cat      = CATEGORIES[currentCategoryView] || { label: currentCategoryView, icon: '📁' };
+    const query    = categoryFilterInput.value.trim().toLowerCase();
+    const order    = sortSelect.value;
+    const allFiles = await getAllFileRecords();
+    const allInCat = allFiles.filter(f => f.category === currentCategoryView);
+    let   files    = [...allInCat];
 
-  if (query) {
-    files = files.filter(f =>
-      f.displayName.toLowerCase().includes(query)                              ||
-      (f.originalFileName || '').toLowerCase().includes(query)                 ||
-      f.fileType.toLowerCase().includes(query)                                 ||
-      (CATEGORIES[f.category]?.label || '').toLowerCase().includes(query)      ||
-      (f.tag || '').toLowerCase().includes(query)
-    );
-  }
-
-  if (order === 'name') {
-    files.sort((a, b) => a.displayName.localeCompare(b.displayName, 'pt-BR'));
-  } else if (order === 'type') {
-    files.sort((a, b) => a.fileType.localeCompare(b.fileType, 'pt-BR'));
-  } else {
-    files.sort((a, b) => new Date(b.updatedAt || b.createdAt) - new Date(a.updatedAt || a.createdAt));
-  }
-
-  categoryNameDisplay.textContent  = cat.label;
-  categorySummaryIcon.textContent  = cat.icon;
-  categorySummaryLabel.textContent = cat.label;
-  const total = allInCat.length;
-  categorySummaryCount.textContent = total === 1 ? '1 arquivo' : `${total} arquivos`;
-
-  if (files.length === 0) {
-    fileList.innerHTML = '';
-    emptyFilterState.classList.remove('is-hidden');
-    const titleEl    = emptyFilterState.querySelector('.empty-filter-state__title');
-    const subtitleEl = emptyFilterState.querySelector('.empty-filter-state__subtitle');
-    if (total === 0 && !query) {
-      titleEl.textContent    = 'Nenhum arquivo nesta categoria';
-      subtitleEl.textContent = 'Adicione um novo arquivo para começar';
-    } else {
-      titleEl.textContent    = 'Nenhum arquivo encontrado nesta categoria';
-      subtitleEl.textContent = 'Tente buscar por outro nome, tipo ou etiqueta';
+    if (query) {
+      files = files.filter(f =>
+        f.displayName.toLowerCase().includes(query)                            ||
+        (f.originalFileName || '').toLowerCase().includes(query)               ||
+        f.fileType.toLowerCase().includes(query)                               ||
+        (CATEGORIES[f.category]?.label || '').toLowerCase().includes(query)    ||
+        (f.tag || '').toLowerCase().includes(query)
+      );
     }
-  } else {
-    emptyFilterState.classList.add('is-hidden');
-    fileList.innerHTML = files.map(buildFileCardHTML).join('');
+
+    if (order === 'name') {
+      files.sort((a, b) => a.displayName.localeCompare(b.displayName, 'pt-BR'));
+    } else if (order === 'type') {
+      files.sort((a, b) => a.fileType.localeCompare(b.fileType, 'pt-BR'));
+    } else {
+      files.sort((a, b) => new Date(b.updatedAt || b.createdAt) - new Date(a.updatedAt || a.createdAt));
+    }
+
+    categoryNameDisplay.textContent  = cat.label;
+    categorySummaryIcon.textContent  = cat.icon;
+    categorySummaryLabel.textContent = cat.label;
+    const total = allInCat.length;
+    categorySummaryCount.textContent = total === 1 ? '1 arquivo' : `${total} arquivos`;
+
+    if (files.length === 0) {
+      fileList.innerHTML = '';
+      emptyFilterState.classList.remove('is-hidden');
+      const titleEl    = emptyFilterState.querySelector('.empty-filter-state__title');
+      const subtitleEl = emptyFilterState.querySelector('.empty-filter-state__subtitle');
+      if (total === 0 && !query) {
+        titleEl.textContent    = 'Nenhum arquivo nesta categoria';
+        subtitleEl.textContent = 'Adicione um novo arquivo para começar';
+      } else {
+        titleEl.textContent    = 'Nenhum arquivo encontrado nesta categoria';
+        subtitleEl.textContent = 'Tente buscar por outro nome, tipo ou etiqueta';
+      }
+    } else {
+      emptyFilterState.classList.add('is-hidden');
+      fileList.innerHTML = files.map(buildFileCardHTML).join('');
+    }
+  } catch (err) {
+    console.error('[Cadê?] Erro ao renderizar categoria:', err);
   }
 }
 
@@ -431,10 +566,17 @@ function buildFileCardHTML(file) {
   const typeClass = `file-card__type-badge--${escapeHTML(file.fileType)}`;
   const typeLabel = file.fileType.toUpperCase();
   const dateStr   = formatDate(file.updatedAt || file.createdAt);
+  const sizeStr   = formatFileSize(file.fileSize);
   const tagHTML   = file.tag
     ? `<div class="file-meta__item">
          <span class="file-meta__label">Etiqueta:</span>
          <span class="file-tag">${escapeHTML(file.tag)}</span>
+       </div>`
+    : '';
+  const sizeHTML  = sizeStr
+    ? `<div class="file-meta__item">
+         <span class="file-meta__label">Tamanho:</span>
+         <span class="file-meta__value">${escapeHTML(sizeStr)}</span>
        </div>`
     : '';
 
@@ -451,26 +593,27 @@ function buildFileCardHTML(file) {
           <span class="file-meta__value">${escapeHTML(cat.icon)} ${escapeHTML(cat.label)}</span>
         </div>
         ${tagHTML}
+        ${sizeHTML}
       </div>
       <div class="card-actions">
         <button type="button" class="btn-open-file" data-id="${escapeHTML(file.id)}"
-          aria-label="Abrir arquivo ${escapeHTML(file.displayName)}">Abrir arquivo →</button>
+          aria-label="Abrir ${escapeHTML(file.displayName)}">Abrir →</button>
         <button type="button" class="btn-edit-file" data-id="${escapeHTML(file.id)}"
-          aria-label="Editar arquivo ${escapeHTML(file.displayName)}">Editar</button>
+          aria-label="Editar ${escapeHTML(file.displayName)}">Editar</button>
         <button type="button" class="btn-delete-file" data-id="${escapeHTML(file.id)}"
-          aria-label="Excluir arquivo ${escapeHTML(file.displayName)}">Excluir</button>
+          aria-label="Excluir ${escapeHTML(file.displayName)}">Excluir</button>
       </div>
     </article>`;
 }
 
 // Event delegation — Tela 3
-fileList.addEventListener('click', e => {
+fileList.addEventListener('click', async e => {
   const openBtn   = e.target.closest('.btn-open-file');
   const editBtn   = e.target.closest('.btn-edit-file');
   const deleteBtn = e.target.closest('.btn-delete-file');
-  if (openBtn)   console.log(`[Cadê?] Abrir arquivo (protótipo): "${openBtn.closest('.file-card').querySelector('.file-card__name').textContent}"`);
-  if (editBtn)   openEditMode(editBtn.dataset.id);
-  if (deleteBtn) openDeleteConfirm(deleteBtn.dataset.id, 'category');
+  if (openBtn)   await openStoredFile(openBtn.dataset.id);
+  if (editBtn)   await openEditMode(editBtn.dataset.id);
+  if (deleteBtn) await openDeleteConfirm(deleteBtn.dataset.id, 'category');
 });
 
 // ══════════════════════════════════════════════
@@ -485,8 +628,8 @@ const searchResultsList  = document.getElementById('search-results-list');
 const emptyResultsState  = document.getElementById('empty-results-state');
 const btnSearchBack      = document.getElementById('btn-search-back');
 
-btnSearchBack.addEventListener('click', () => {
-  renderHomeState();
+btnSearchBack.addEventListener('click', async () => {
+  await renderHomeState();
   showScreen('home');
 });
 
@@ -495,38 +638,42 @@ resultsSearchForm.addEventListener('submit', e => {
   renderSearchResults(resultsSearchInput.value.trim());
 });
 
-function openSearchResultsScreen(query) {
+async function openSearchResultsScreen(query) {
   resultsSearchInput.value = query || '';
-  renderSearchResults(query);
   showScreen('searchResults');
+  await renderSearchResults(query);
 }
 
-function renderSearchResults(term) {
-  const query = (term || '').toLowerCase().trim();
-  const files = getFiles();
-  let results = query
-    ? files.filter(f =>
-        f.displayName.toLowerCase().includes(query)                              ||
-        (f.originalFileName || '').toLowerCase().includes(query)                 ||
-        f.fileType.toLowerCase().includes(query)                                 ||
-        (CATEGORIES[f.category]?.label || '').toLowerCase().includes(query)      ||
-        (f.tag || '').toLowerCase().includes(query)
-      )
-    : [...files];
+async function renderSearchResults(term) {
+  try {
+    const query   = (term || '').toLowerCase().trim();
+    const allFiles = await getAllFileRecords();
+    let results   = query
+      ? allFiles.filter(f =>
+          f.displayName.toLowerCase().includes(query)                          ||
+          (f.originalFileName || '').toLowerCase().includes(query)             ||
+          f.fileType.toLowerCase().includes(query)                             ||
+          (CATEGORIES[f.category]?.label || '').toLowerCase().includes(query)  ||
+          (f.tag || '').toLowerCase().includes(query)
+        )
+      : [...allFiles];
 
-  if (query && results.length > 0) {
-    resultsTermDisplay.textContent = term;
-    resultsFeedback.classList.remove('is-hidden');
-  } else {
-    resultsFeedback.classList.add('is-hidden');
-  }
+    if (query && results.length > 0) {
+      resultsTermDisplay.textContent = term;
+      resultsFeedback.classList.remove('is-hidden');
+    } else {
+      resultsFeedback.classList.add('is-hidden');
+    }
 
-  if (results.length === 0) {
-    searchResultsList.innerHTML = '';
-    emptyResultsState.classList.remove('is-hidden');
-  } else {
-    emptyResultsState.classList.add('is-hidden');
-    searchResultsList.innerHTML = results.map(buildResultCardHTML).join('');
+    if (results.length === 0) {
+      searchResultsList.innerHTML = '';
+      emptyResultsState.classList.remove('is-hidden');
+    } else {
+      emptyResultsState.classList.add('is-hidden');
+      searchResultsList.innerHTML = results.map(buildResultCardHTML).join('');
+    }
+  } catch (err) {
+    console.error('[Cadê?] Erro ao buscar arquivos:', err);
   }
 }
 
@@ -535,10 +682,17 @@ function buildResultCardHTML(file) {
   const typeClass = `result-card__type-badge--${escapeHTML(file.fileType)}`;
   const typeLabel = file.fileType.toUpperCase();
   const dateStr   = formatDate(file.updatedAt || file.createdAt);
+  const sizeStr   = formatFileSize(file.fileSize);
   const tagHTML   = file.tag
     ? `<div class="result-meta__item">
          <span class="result-meta__label">Etiqueta:</span>
          <span class="result-tag">${escapeHTML(file.tag)}</span>
+       </div>`
+    : '';
+  const sizeHTML  = sizeStr
+    ? `<div class="result-meta__item">
+         <span class="result-meta__label">Tamanho:</span>
+         <span class="result-meta__value">${escapeHTML(sizeStr)}</span>
        </div>`
     : '';
 
@@ -555,30 +709,31 @@ function buildResultCardHTML(file) {
           <span class="result-meta__value">${escapeHTML(cat.icon)} ${escapeHTML(cat.label)}</span>
         </div>
         ${tagHTML}
+        ${sizeHTML}
       </div>
       <div class="result-actions">
         <button type="button" class="btn-open-result" data-id="${escapeHTML(file.id)}"
-          aria-label="Abrir arquivo ${escapeHTML(file.displayName)}">Abrir arquivo →</button>
+          aria-label="Abrir ${escapeHTML(file.displayName)}">Abrir →</button>
         <button type="button" class="btn-ver-categoria" data-id="${escapeHTML(file.id)}" data-category="${escapeHTML(file.category)}"
           aria-label="Ver arquivos de ${escapeHTML(cat.label)}">Ver categoria</button>
         <button type="button" class="btn-edit-result" data-id="${escapeHTML(file.id)}"
-          aria-label="Editar arquivo ${escapeHTML(file.displayName)}">Editar</button>
+          aria-label="Editar ${escapeHTML(file.displayName)}">Editar</button>
         <button type="button" class="btn-delete-result" data-id="${escapeHTML(file.id)}"
-          aria-label="Excluir arquivo ${escapeHTML(file.displayName)}">Excluir</button>
+          aria-label="Excluir ${escapeHTML(file.displayName)}">Excluir</button>
       </div>
     </article>`;
 }
 
 // Event delegation — Tela 4
-searchResultsList.addEventListener('click', e => {
+searchResultsList.addEventListener('click', async e => {
   const openBtn   = e.target.closest('.btn-open-result');
   const catBtn    = e.target.closest('.btn-ver-categoria');
   const editBtn   = e.target.closest('.btn-edit-result');
   const deleteBtn = e.target.closest('.btn-delete-result');
-  if (openBtn)   console.log(`[Cadê?] Abrir arquivo (protótipo): "${openBtn.closest('.result-card').querySelector('.result-card__name').textContent}"`);
-  if (catBtn)    openCategoryScreen(catBtn.dataset.category);
-  if (editBtn)   openEditMode(editBtn.dataset.id);
-  if (deleteBtn) openDeleteConfirm(deleteBtn.dataset.id, 'search');
+  if (openBtn)   await openStoredFile(openBtn.dataset.id);
+  if (catBtn)    await openCategoryScreen(catBtn.dataset.category);
+  if (editBtn)   await openEditMode(editBtn.dataset.id);
+  if (deleteBtn) await openDeleteConfirm(deleteBtn.dataset.id, 'search');
 });
 
 // ══════════════════════════════════════════════
@@ -593,13 +748,17 @@ const btnDeleteCancel  = document.getElementById('btn-delete-cancel');
 let pendingDeleteId      = null;
 let pendingDeleteContext = null;
 
-function openDeleteConfirm(id, context) {
-  const file = getFileById(id);
-  if (!file) return;
-  pendingDeleteId      = id;
-  pendingDeleteContext = context;
-  deleteModalName.textContent = file.displayName;
-  deleteModal.classList.remove('is-hidden');
+async function openDeleteConfirm(id, context) {
+  try {
+    const file = await getFileRecordById(id);
+    if (!file) return;
+    pendingDeleteId      = id;
+    pendingDeleteContext = context;
+    deleteModalName.textContent = file.displayName;
+    deleteModal.classList.remove('is-hidden');
+  } catch (err) {
+    console.error('[Cadê?] Erro ao abrir confirmação de exclusão:', err);
+  }
 }
 
 btnDeleteCancel.addEventListener('click', () => {
@@ -608,18 +767,24 @@ btnDeleteCancel.addEventListener('click', () => {
   deleteModal.classList.add('is-hidden');
 });
 
-btnDeleteConfirm.addEventListener('click', () => {
+btnDeleteConfirm.addEventListener('click', async () => {
   if (!pendingDeleteId) return;
-  deleteFile(pendingDeleteId);
-  deleteModal.classList.add('is-hidden');
-  renderHomeState();
-  if (pendingDeleteContext === 'search') {
-    renderSearchResults(resultsSearchInput.value.trim());
-  } else {
-    renderCategoryFiles();
+  try {
+    await deleteFileRecord(pendingDeleteId);
+    deleteModal.classList.add('is-hidden');
+    await renderHomeState();
+    if (pendingDeleteContext === 'search') {
+      await renderSearchResults(resultsSearchInput.value.trim());
+    } else {
+      await renderCategoryFiles();
+    }
+  } catch (err) {
+    console.error('[Cadê?] Erro ao excluir arquivo:', err);
+    deleteModal.classList.add('is-hidden');
+  } finally {
+    pendingDeleteId      = null;
+    pendingDeleteContext = null;
   }
-  pendingDeleteId      = null;
-  pendingDeleteContext = null;
 });
 
 deleteModal.addEventListener('click', e => {
@@ -630,4 +795,14 @@ deleteModal.addEventListener('click', e => {
 //  INICIALIZAÇÃO
 // ══════════════════════════════════════════════
 
-renderHomeState();
+async function init() {
+  try {
+    await openDatabase();
+    await renderHomeState();
+    console.log('[Cadê?] IndexedDB inicializado com sucesso.');
+  } catch (err) {
+    console.error('[Cadê?] Erro ao inicializar banco de dados:', err);
+  }
+}
+
+init();

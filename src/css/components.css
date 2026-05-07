@@ -392,6 +392,29 @@
   color: var(--color-white);
 }
 
+/* --- Botão de download --- */
+.btn-download-file,
+.btn-download-result {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--space-2) var(--space-3);
+  background-color: var(--color-white);
+  border: 1.5px solid var(--color-primary-dark);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  transition: background-color var(--transition), color var(--transition), border-color var(--transition);
+}
+
+.btn-download-file:hover,
+.btn-download-result:hover {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--color-secondary);
+}
+
 /* --- Botão de perigo --- */
 .btn-danger {
   background-color: #EF4444;
