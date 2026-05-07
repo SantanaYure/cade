@@ -77,6 +77,117 @@
 
     </div><!-- /screen-home -->
 
+    <!-- ===== TELA 2: UPLOAD E NOMEAÇÃO ===== -->
+    <section id="upload-screen" class="screen upload-screen is-hidden">
+
+      <!-- Header -->
+      <header class="upload-header">
+        <div class="container">
+          <span class="logo">Cadê?</span>
+        </div>
+      </header>
+
+      <!-- Conteúdo principal -->
+      <main class="upload-main container">
+
+        <!-- Intro -->
+        <div class="upload-intro">
+          <h1 class="upload-intro__title">Adicionar arquivo</h1>
+          <p class="upload-intro__subtitle">Envie um documento e organize-o por categoria</p>
+        </div>
+
+        <!-- Card do formulário -->
+        <div class="upload-card">
+
+          <!-- Área de upload -->
+          <div class="form-group">
+            <label class="upload-area" id="upload-area" for="upload-input">
+              <input
+                type="file"
+                id="upload-input"
+                class="upload-input"
+                accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,image/*"
+                aria-label="Selecionar arquivo"
+              />
+              <div class="upload-area__content" id="upload-content">
+                <span class="upload-area__icon" aria-hidden="true">📎</span>
+                <span class="upload-area__text">Toque ou clique para selecionar um arquivo</span>
+                <span class="upload-area__hint">PDF, imagem ou documento</span>
+              </div>
+              <div class="upload-area__selected is-hidden" id="upload-selected">
+                <span class="upload-area__selected-icon" aria-hidden="true">📄</span>
+                <span id="filename-text" class="upload-area__filename"></span>
+                <span class="upload-area__change-hint">Clique para trocar</span>
+              </div>
+            </label>
+          </div>
+
+          <!-- Nome do arquivo -->
+          <div class="form-group">
+            <label class="form-label" for="file-name">Nome do arquivo</label>
+            <div class="form-input-wrapper">
+              <input
+                type="text"
+                id="file-name"
+                class="form-input"
+                placeholder="Comprovante de residência 2026"
+                maxlength="100"
+              />
+            </div>
+          </div>
+
+          <!-- Categoria -->
+          <div class="form-group">
+            <span class="form-label">Categoria</span>
+            <div class="category-options" role="radiogroup" aria-label="Escolha uma categoria">
+              <button type="button" class="category-option" data-category="pessoal" role="radio" aria-checked="false">
+                <span aria-hidden="true">🏠</span>
+                Pessoal
+              </button>
+              <button type="button" class="category-option" data-category="academico" role="radio" aria-checked="false">
+                <span aria-hidden="true">🎓</span>
+                Acadêmico
+              </button>
+              <button type="button" class="category-option" data-category="trabalho" role="radio" aria-checked="false">
+                <span aria-hidden="true">💼</span>
+                Trabalho
+              </button>
+            </div>
+          </div>
+
+          <!-- Etiqueta opcional -->
+          <div class="form-group">
+            <label class="form-label" for="file-tag">
+              Etiqueta <span class="form-label--optional">(opcional)</span>
+            </label>
+            <div class="form-input-wrapper">
+              <input
+                type="text"
+                id="file-tag"
+                class="form-input"
+                placeholder="CNH, matrícula, currículo, contrato"
+                maxlength="50"
+              />
+            </div>
+          </div>
+
+          <!-- Mensagem de sucesso -->
+          <div class="success-message is-hidden" id="success-message" role="alert" aria-live="polite">
+            <span class="success-message__icon" aria-hidden="true">✅</span>
+            <span>Arquivo salvo com sucesso</span>
+          </div>
+
+        </div><!-- /upload-card -->
+
+        <!-- Ações -->
+        <div class="upload-actions">
+          <button id="btn-save" type="button" class="btn btn-primary btn-full">Salvar arquivo</button>
+          <button id="btn-back" type="button" class="btn btn-secondary btn-full">Voltar</button>
+        </div>
+
+      </main>
+    </section><!-- /upload-screen -->
+
     <!-- JS -->
     <script src="src/js/main.js"></script>
   </body>

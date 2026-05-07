@@ -123,6 +123,100 @@
   color: var(--color-text-primary);
 }
 
+/* --- Utilitário: ocultar elemento --- */
+.is-hidden {
+  display: none !important;
+}
+
+/* --- Botão secundário --- */
+.btn-secondary {
+  background-color: var(--color-white);
+  color: var(--color-secondary);
+  border: 2px solid var(--color-secondary);
+}
+
+.btn-secondary:hover {
+  background-color: var(--color-surface);
+}
+
+.btn-secondary:active {
+  background-color: var(--color-border);
+}
+
+/* --- Botão largura total --- */
+.btn-full {
+  width: 100%;
+  padding-block: var(--space-4);
+  font-size: var(--font-size-md);
+}
+
+/* --- Grupo de campo de formulário --- */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+/* --- Label do formulário --- */
+.form-label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.form-label--optional {
+  font-weight: var(--font-weight-normal);
+  color: var(--color-text-secondary);
+}
+
+/* --- Wrapper do input --- */
+.form-input-wrapper {
+  background-color: var(--color-white);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+.form-input-wrapper:focus-within {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(255, 204, 0, 0.18);
+}
+
+.form-input-wrapper.is-error {
+  border-color: #EF4444;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.12);
+}
+
+/* --- Input de texto --- */
+.form-input {
+  font-size: var(--font-size-md);
+  color: var(--color-text-primary);
+  background: none;
+  outline: none;
+  width: 100%;
+  border: none;
+}
+
+/* --- Mensagem de sucesso --- */
+.success-message {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  background-color: #F0FDF4;
+  border: 1.5px solid #86EFAC;
+  border-radius: var(--radius-md);
+  color: #166534;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+}
+
+.success-message__icon {
+  font-size: var(--font-size-lg);
+  flex-shrink: 0;
+}
+
 /* --- Empty state --- */
 .empty-state {
   display: flex;
