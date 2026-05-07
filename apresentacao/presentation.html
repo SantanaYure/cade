@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cadê? — Apresentação</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../src/css/variables.css">
+  <link rel="stylesheet" href="../src/css/base.css">
+  <link rel="stylesheet" href="src/css/presentation.css">
+</head>
+<body>
+
+  <div class="presentation">
+
+    <!-- =============================================
+         SLIDES
+         ============================================= -->
+    <div class="slides-wrapper">
+
+      <!-- SLIDE 1: Capa -->
+      <section class="slide slide--active" data-slide="1" aria-label="Slide 1: Capa">
+        <div class="slide__accent-bar"></div>
+        <div class="slide__content slide__content--capa">
+
+          <div class="capa__left">
+            <span class="capa__tag">Atividade 7 &middot; 1&ordf; Fase</span>
+            <h1 class="capa__title">Cad&ecirc;?</h1>
+            <p class="capa__subtitle">Organize e encontre seus arquivos em segundos</p>
+            <div class="capa__team">
+              <span>Eduardo</span>
+              <span class="capa__separator">&middot;</span>
+              <span>Yasmin</span>
+              <span class="capa__separator">&middot;</span>
+              <span>Yure</span>
+            </div>
+          </div>
+
+          <div class="capa__right">
+            <div class="capa__icon-circle">
+              <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <circle cx="33" cy="33" r="19" stroke="#000000" stroke-width="6"/>
+                <line x1="47" y1="47" x2="67" y2="67" stroke="#000000" stroke-width="6" stroke-linecap="round"/>
+              </svg>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- SLIDE 2: Frase-problema -->
+      <section class="slide" data-slide="2" aria-label="Slide 2: Frase-problema">
+        <div class="slide__content">
+
+          <div class="slide__header">
+            <span class="slide__label">02</span>
+            <h2 class="slide__title">Frase-problema</h2>
+          </div>
+
+          <div class="problema__card">
+            <p class="problema__text">
+              Pessoas que lidam com arquivos pessoais, acad&ecirc;micos e profissionais t&ecirc;m dificuldade em
+              <mark class="highlight">localizar documentos rapidamente</mark> porque eles ficam
+              <mark class="highlight">espalhados</mark> e sem organiza&ccedil;&atilde;o padronizada.
+              Isso gera <mark class="highlight">perda de tempo</mark>, retrabalho e frustra&ccedil;&atilde;o,
+              especialmente em situa&ccedil;&otilde;es de urg&ecirc;ncia.
+            </p>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- SLIDE 3: Persona -->
+      <section class="slide" data-slide="3" aria-label="Slide 3: Persona">
+        <div class="slide__content">
+
+          <div class="slide__header">
+            <span class="slide__label">03</span>
+            <h2 class="slide__title">Persona</h2>
+          </div>
+
+          <div class="persona__card">
+            <div class="persona__header">
+              <div class="persona__avatar" aria-hidden="true">B</div>
+              <div>
+                <h3 class="persona__name">Bruna, 25 anos</h3>
+                <p class="persona__role">Estudante &middot; Trabalho &middot; Est&aacute;gio</p>
+              </div>
+            </div>
+
+            <div class="persona__blocks">
+              <div class="persona__block">
+                <span class="persona__block-label">Contexto</span>
+                <p>
+                  Estudante universit&aacute;ria que tamb&eacute;m trabalha e faz est&aacute;gio.
+                  Est&aacute; em processo de tirar a habilita&ccedil;&atilde;o e lida com arquivos da
+                  faculdade, documentos pessoais e demandas do trabalho. Costuma salvar tudo rapidamente
+                  em locais gen&eacute;ricos, como Downloads ou &aacute;rea de trabalho.
+                </p>
+              </div>
+              <div class="persona__block">
+                <span class="persona__block-label">Objetivo</span>
+                <p>
+                  Localizar qualquer documento importante em menos de 1 minuto, sem abrir pasta por
+                  pasta ou pesquisar no hist&oacute;rico do e-mail.
+                </p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- SLIDE 4: MVP -->
+      <section class="slide" data-slide="4" aria-label="Slide 4: MVP">
+        <div class="slide__content slide__content--centered">
+
+          <div class="slide__header slide__header--centered">
+            <span class="slide__label">04</span>
+            <h2 class="slide__title">MVP</h2>
+          </div>
+
+          <p class="mvp__statement">
+            Um web app que organiza arquivos por categoria e permite encontr&aacute;-los
+            rapidamente por meio de busca simples.
+          </p>
+
+          <div class="mvp__categories">
+            <span class="category-badge category-badge--pessoal">Pessoal</span>
+            <span class="category-badge category-badge--academico">Acad&ecirc;mico</span>
+            <span class="category-badge category-badge--trabalho">Trabalho</span>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- SLIDE 5: AGORA -->
+      <section class="slide" data-slide="5" aria-label="Slide 5: AGORA - mínimo viável">
+        <div class="slide__content">
+
+          <div class="slide__header">
+            <span class="slide__label">05</span>
+            <h2 class="slide__title">AGORA: <span class="slide__title-light">m&iacute;nimo vi&aacute;vel</span></h2>
+          </div>
+
+          <div class="agora__grid">
+
+            <div class="feature-card">
+              <span class="feature-card__number">01</span>
+              <h3 class="feature-card__title">Upload e categoriza&ccedil;&atilde;o</h3>
+              <p class="feature-card__text">Envie arquivos e organize por contexto de uso</p>
+            </div>
+
+            <div class="feature-card">
+              <span class="feature-card__number">02</span>
+              <h3 class="feature-card__title">Busca inteligente</h3>
+              <p class="feature-card__text">Encontre por nome, tipo ou categoria</p>
+            </div>
+
+            <div class="feature-card">
+              <span class="feature-card__number">03</span>
+              <h3 class="feature-card__title">Visualiza&ccedil;&atilde;o por categoria</h3>
+              <p class="feature-card__text">Identifique arquivos rapidamente pela organiza&ccedil;&atilde;o visual</p>
+            </div>
+
+            <div class="feature-card">
+              <span class="feature-card__number">04</span>
+              <h3 class="feature-card__title">Renomea&ccedil;&atilde;o e etiquetas</h3>
+              <p class="feature-card__text">Personalize o nome e adicione etiquetas no upload</p>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 6: DEPOIS -->
+      <section class="slide" data-slide="6" aria-label="Slide 6: DEPOIS - próximas iterações">
+        <div class="slide__content">
+
+          <div class="slide__header">
+            <span class="slide__label">06</span>
+            <h2 class="slide__title">DEPOIS: <span class="slide__title-light">pr&oacute;ximas itera&ccedil;&otilde;es</span></h2>
+          </div>
+
+          <div class="depois__grid">
+
+            <div class="depois__card">
+              <div class="depois__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z" fill="currentColor"/>
+                </svg>
+              </div>
+              <h3 class="depois__card-title">Sincroniza&ccedil;&atilde;o com Google Drive e OneDrive</h3>
+              <p>
+                Fica para depois porque exige integra&ccedil;&atilde;o com APIs externas e autentica&ccedil;&atilde;o
+                OAuth. No MVP, o upload manual j&aacute; resolve a dor principal.
+              </p>
+            </div>
+
+            <div class="depois__card">
+              <div class="depois__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                  <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                </svg>
+              </div>
+              <h3 class="depois__card-title">Alertas de vencimento de documentos</h3>
+              <p>
+                Fica para depois porque exige l&oacute;gica de datas e notifica&ccedil;&otilde;es.
+                &Eacute; &uacute;til, mas n&atilde;o &eacute; essencial para validar a localiza&ccedil;&atilde;o
+                r&aacute;pida de arquivos.
+              </p>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 7: Reflexão técnica -->
+      <section class="slide" data-slide="7" aria-label="Slide 7: Reflexão técnica">
+        <div class="slide__content">
+
+          <div class="slide__header">
+            <span class="slide__label">07</span>
+            <h2 class="slide__title">Reflex&atilde;o t&eacute;cnica</h2>
+          </div>
+
+          <div class="reflexao__cards">
+            <div class="reflexao__card">
+              <span class="reflexao__card-label">Tipo de solu&ccedil;&atilde;o</span>
+              <p class="reflexao__card-value">Web app responsivo</p>
+            </div>
+            <div class="reflexao__card">
+              <span class="reflexao__card-label">Tecnologias</span>
+              <p class="reflexao__card-value">React, Next.js, Tailwind CSS e Firebase</p>
+            </div>
+            <div class="reflexao__card reflexao__card--risk">
+              <span class="reflexao__card-label">Maior risco</span>
+              <p class="reflexao__card-value">Busca r&aacute;pida com muitos arquivos</p>
+            </div>
+          </div>
+
+          <div class="reflexao__text">
+            <p>
+              O Cad&ecirc;? ser&aacute; um web app responsivo, acess&iacute;vel pelo navegador no computador
+              e no celular. O time pretende usar React com Next.js, Tailwind CSS e Firebase para desenvolver
+              a aplica&ccedil;&atilde;o e armazenar os arquivos. O maior risco t&eacute;cnico est&aacute; em
+              manter a busca r&aacute;pida quando o volume de documentos crescer. Para isso, ser&aacute;
+              necess&aacute;rio usar metadados, filtros, pagina&ccedil;&atilde;o e busca indexada. No MVP,
+              o foco &eacute; validar a organiza&ccedil;&atilde;o e localiza&ccedil;&atilde;o de documentos
+              importantes.
+            </p>
+          </div>
+
+        </div>
+      </section>
+
+    </div><!-- fim slides-wrapper -->
+
+    <!-- =============================================
+         NAVEGAÇÃO
+         ============================================= -->
+    <nav class="presentation__nav" aria-label="Navegação entre slides">
+
+      <button class="nav-btn nav-btn--prev" id="btn-prev" aria-label="Slide anterior" disabled>
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <path d="M10 3L5 8L10 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Anterior
+      </button>
+
+      <div class="presentation__dots" id="dots" role="presentation"></div>
+
+      <span class="presentation__counter" id="counter" aria-live="polite">Slide 1 de 7</span>
+
+      <button class="nav-btn nav-btn--next" id="btn-next" aria-label="Próximo slide">
+        Pr&oacute;ximo
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <path d="M6 3L11 8L6 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+
+    </nav>
+
+  </div><!-- fim presentation -->
+
+  <script src="src/js/presentation.js"></script>
+</body>
+</html>
