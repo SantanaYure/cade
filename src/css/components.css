@@ -123,6 +123,100 @@
   color: var(--color-text-primary);
 }
 
+/* --- Utilitário: ocultar elemento --- */
+.is-hidden {
+  display: none !important;
+}
+
+/* --- Botão secundário --- */
+.btn-secondary {
+  background-color: var(--color-white);
+  color: var(--color-secondary);
+  border: 2px solid var(--color-secondary);
+}
+
+.btn-secondary:hover {
+  background-color: var(--color-surface);
+}
+
+.btn-secondary:active {
+  background-color: var(--color-border);
+}
+
+/* --- Botão largura total --- */
+.btn-full {
+  width: 100%;
+  padding-block: var(--space-4);
+  font-size: var(--font-size-md);
+}
+
+/* --- Grupo de campo de formulário --- */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+/* --- Label do formulário --- */
+.form-label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.form-label--optional {
+  font-weight: var(--font-weight-normal);
+  color: var(--color-text-secondary);
+}
+
+/* --- Wrapper do input --- */
+.form-input-wrapper {
+  background-color: var(--color-white);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+.form-input-wrapper:focus-within {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(255, 204, 0, 0.18);
+}
+
+.form-input-wrapper.is-error {
+  border-color: #EF4444;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.12);
+}
+
+/* --- Input de texto --- */
+.form-input {
+  font-size: var(--font-size-md);
+  color: var(--color-text-primary);
+  background: none;
+  outline: none;
+  width: 100%;
+  border: none;
+}
+
+/* --- Mensagem de sucesso --- */
+.success-message {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  background-color: #F0FDF4;
+  border: 1.5px solid #86EFAC;
+  border-radius: var(--radius-md);
+  color: #166534;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+}
+
+.success-message__icon {
+  font-size: var(--font-size-lg);
+  flex-shrink: 0;
+}
+
 /* --- Empty state --- */
 .empty-state {
   display: flex;
@@ -150,4 +244,287 @@
   font-size: var(--font-size-sm);
   color: var(--color-text-secondary);
   max-width: 260px;
+}
+
+/* --- Botão de retorno (link com seta) --- */
+.btn-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-secondary);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: var(--space-2) 0;
+  transition: color var(--transition), gap var(--transition);
+}
+
+.btn-back-link:hover {
+  color: var(--color-text-primary);
+  gap: var(--space-2);
+}
+
+/* --- Select de ordenação --- */
+.sort-select-wrapper {
+  position: relative;
+}
+
+.sort-select-wrapper::after {
+  content: '▾';
+  position: absolute;
+  right: var(--space-3);
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  line-height: 1;
+}
+
+.sort-select {
+  width: 100%;
+  appearance: none;
+  -webkit-appearance: none;
+  background-color: var(--color-white);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-8) var(--space-3) var(--space-4);
+  font-family: var(--font-family);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+.sort-select:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(255, 204, 0, 0.18);
+}
+
+/* ============================================
+   Componentes do CRUD
+   ============================================ */
+
+/* --- Mensagem de erro inline (abaixo dos campos) --- */
+.field-error {
+  display: block;
+  font-size: var(--font-size-xs);
+  color: #DC2626;
+  font-weight: var(--font-weight-medium);
+  min-height: 1.1em;
+}
+
+/* --- Arquivo de referência (modo edição Tela 2) --- */
+.edit-reference {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  background-color: var(--color-surface);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.edit-reference__label {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+
+.edit-reference__filename {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-primary);
+  word-break: break-all;
+}
+
+/* --- Ações dos cards (Telas 3 e 4) --- */
+.card-actions {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  margin-top: var(--space-1);
+}
+
+.btn-edit-file,
+.btn-edit-result {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--space-2) var(--space-3);
+  background-color: var(--color-white);
+  border: 1.5px solid var(--color-secondary);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-secondary);
+  cursor: pointer;
+  transition: background-color var(--transition), color var(--transition);
+}
+
+.btn-edit-file:hover,
+.btn-edit-result:hover {
+  background-color: var(--color-secondary);
+  color: var(--color-primary);
+}
+
+.btn-delete-file,
+.btn-delete-result {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--space-2) var(--space-3);
+  background-color: var(--color-white);
+  border: 1.5px solid #EF4444;
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: #EF4444;
+  cursor: pointer;
+  transition: background-color var(--transition), color var(--transition);
+}
+
+.btn-delete-file:hover,
+.btn-delete-result:hover {
+  background-color: #EF4444;
+  color: var(--color-white);
+}
+
+/* --- Botão de download --- */
+.btn-download-file,
+.btn-download-result {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--space-2) var(--space-3);
+  background-color: var(--color-white);
+  border: 1.5px solid var(--color-primary-dark);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  transition: background-color var(--transition), color var(--transition), border-color var(--transition);
+}
+
+.btn-download-file:hover,
+.btn-download-result:hover {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--color-secondary);
+}
+
+/* --- Botão de perigo --- */
+.btn-danger {
+  background-color: #EF4444;
+  color: var(--color-white);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-danger:hover {
+  background-color: #DC2626;
+  box-shadow: var(--shadow-md);
+}
+
+/* --- Modal de confirmação de exclusão --- */
+.delete-modal {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(15, 23, 42, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: var(--space-4);
+  backdrop-filter: blur(2px);
+}
+
+.delete-modal__box {
+  background-color: var(--color-white);
+  border-radius: var(--radius-2xl);
+  padding: var(--space-6);
+  max-width: 340px;
+  width: 100%;
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.delete-modal__title {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+}
+
+.delete-modal__body {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+}
+
+.delete-modal__actions {
+  display: flex;
+  gap: var(--space-3);
+}
+
+.delete-modal__actions .btn {
+  flex: 1;
+  padding-block: var(--space-3);
+}
+
+/* --- Resumo de arquivos na Tela Inicial --- */
+.home-files-summary {
+  padding-inline: var(--space-4);
+  padding-bottom: var(--space-8);
+}
+
+.home-summary__text {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  text-align: center;
+  padding: var(--space-3) var(--space-4);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+}
+
+/* --- Painel de sucesso após upload --- */
+.upload-success-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--space-4);
+  padding: var(--space-8) var(--space-6);
+  background-color: #F0FDF4;
+  border: 1.5px solid #86EFAC;
+  border-radius: var(--radius-2xl);
+  margin-top: var(--space-6);
+}
+
+.upload-success-panel__icon {
+  font-size: 3rem;
+  line-height: 1;
+}
+
+.upload-success-panel__title {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  color: #166534;
+}
+
+.upload-success-panel__subtitle {
+  font-size: var(--font-size-sm);
+  color: #15803D;
+  max-width: 280px;
+  line-height: 1.6;
+}
+
+.upload-success-panel__actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  width: 100%;
 }
