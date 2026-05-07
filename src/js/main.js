@@ -11,65 +11,10 @@ const CATEGORIES = {
   trabalho:  { label: 'Trabalho',  icon: '💼' },
 };
 
-// ─── Arquivos simulados ───────────────────────
-let simulatedFiles = [
-  {
-    id: 1,
-    nome: 'Comprovante de residência 2026',
-    tipo: 'pdf',
-    categoria: 'pessoal',
-    etiqueta: 'Comprovante',
-    data: '06/05/2026',
-    timestamp: Date.parse('2026-05-06'),
-  },
-  {
-    id: 2,
-    nome: 'CNH digital',
-    tipo: 'imagem',
-    categoria: 'pessoal',
-    etiqueta: 'CNH',
-    data: '05/05/2026',
-    timestamp: Date.parse('2026-05-05'),
-  },
-  {
-    id: 3,
-    nome: 'Contrato de aluguel',
-    tipo: 'docx',
-    categoria: 'pessoal',
-    etiqueta: 'Contrato',
-    data: '02/05/2026',
-    timestamp: Date.parse('2026-05-02'),
-  },
-  {
-    id: 4,
-    nome: 'Currículo Bruna 2026',
-    tipo: 'pdf',
-    categoria: 'trabalho',
-    etiqueta: 'Currículo',
-    data: '06/05/2026',
-    timestamp: Date.parse('2026-05-06'),
-  },
-  {
-    id: 5,
-    nome: 'Currículo atualizado tecnologia',
-    tipo: 'docx',
-    categoria: 'trabalho',
-    etiqueta: 'Currículo',
-    data: '04/05/2026',
-    timestamp: Date.parse('2026-05-04'),
-  },
-  {
-    id: 6,
-    nome: 'Modelo de currículo acadêmico',
-    tipo: 'pdf',
-    categoria: 'academico',
-    etiqueta: 'Currículo',
-    data: '28/04/2026',
-    timestamp: Date.parse('2026-04-28'),
-  },
-];
+// ─── Arquivos ────────────────────────────────
+let simulatedFiles = [];
 
-let nextFileId = 7;
+let nextFileId = 1;
 
 // ─── Referências: telas ───────────────────────
 const screenHome          = document.querySelector('.screen-home');
