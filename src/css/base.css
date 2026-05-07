@@ -1,0 +1,96 @@
+/* ============================================
+   base.css — Reset e estilos globais
+   ============================================ */
+
+/* --- Box-sizing universal --- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* --- HTML / Body --- */
+html {
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-family);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-normal);
+  line-height: 1.6;
+  color: var(--color-text-primary);
+  background-color: var(--color-bg);
+  min-height: 100dvh;
+}
+
+/* --- Tipografia --- */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: var(--font-weight-bold);
+  line-height: 1.25;
+  color: var(--color-text-primary);
+}
+
+h1 { font-size: var(--font-size-3xl); }
+h2 { font-size: var(--font-size-2xl); }
+h3 { font-size: var(--font-size-xl); }
+
+p {
+  color: var(--color-text-secondary);
+  line-height: 1.7;
+}
+
+/* --- Links --- */
+a {
+  color: var(--color-text-primary);
+  text-decoration: none;
+  transition: color var(--transition);
+}
+
+a:hover {
+  color: var(--color-primary-dark);
+}
+
+/* --- Botões --- */
+button {
+  font-family: var(--font-family);
+  font-size: var(--font-size-md);
+  cursor: pointer;
+  border: none;
+  background: none;
+  line-height: 1;
+}
+
+button:focus-visible,
+input:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* --- Inputs --- */
+input {
+  font-family: var(--font-family);
+  font-size: var(--font-size-md);
+  border: none;
+  background: none;
+  width: 100%;
+}
+
+input::placeholder {
+  color: var(--color-text-secondary);
+}
+
+/* --- Imagens --- */
+img {
+  max-width: 100%;
+  display: block;
+}
+
+/* --- Listas --- */
+ul, ol {
+  list-style: none;
+}

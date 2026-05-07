@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cadê?</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="src/css/variables.css" />
+    <link rel="stylesheet" href="src/css/base.css" />
+    <link rel="stylesheet" href="src/css/components.css" />
+    <link rel="stylesheet" href="src/css/home.css" />
+  </head>
+  <body>
+
+    <!-- ===== TELA INICIAL ===== -->
+    <div class="screen screen-home">
+
+      <!-- Header -->
+      <header class="home-header">
+        <div class="container">
+          <span class="logo">Cadê?</span>
+        </div>
+      </header>
+
+      <!-- Hero -->
+      <section class="hero container">
+        <h1 class="hero__title">Encontre seus arquivos em segundos</h1>
+        <p class="hero__subtitle">
+          Organize documentos pessoais, acadêmicos e profissionais em um só lugar
+        </p>
+
+        <!-- Barra de busca -->
+        <div class="search-bar">
+          <input
+            id="search-input"
+            type="search"
+            class="search-bar__input"
+            placeholder="Busque por nome, tipo ou categoria"
+            aria-label="Buscar arquivos"
+          />
+        </div>
+
+        <!-- Botão principal -->
+        <button id="btn-add-file" class="btn btn-primary">
+          + Adicionar arquivo
+        </button>
+      </section>
+
+      <!-- Categorias -->
+      <section class="categories container">
+        <h2 class="categories__title">Categorias</h2>
+        <div class="categories__grid">
+          <button class="category-card" data-category="pessoal">
+            <span class="category-card__icon">🏠</span>
+            <span class="category-card__label">Pessoal</span>
+          </button>
+          <button class="category-card" data-category="academico">
+            <span class="category-card__icon">🎓</span>
+            <span class="category-card__label">Acadêmico</span>
+          </button>
+          <button class="category-card" data-category="trabalho">
+            <span class="category-card__icon">💼</span>
+            <span class="category-card__label">Trabalho</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- Estado inicial / Empty state -->
+      <section class="empty-state container" id="empty-state">
+        <div class="empty-state__icon">📂</div>
+        <p class="empty-state__title">Você ainda não adicionou arquivos</p>
+        <p class="empty-state__subtitle">
+          Comece enviando um documento ou acessando uma categoria
+        </p>
+      </section>
+
+    </div><!-- /screen-home -->
+
+    <!-- JS -->
+    <script src="src/js/main.js"></script>
+  </body>
+</html>
