@@ -304,3 +304,165 @@
   border-color: var(--color-primary);
   box-shadow: 0 0 0 3px rgba(255, 204, 0, 0.18);
 }
+
+/* ============================================
+   Componentes do CRUD
+   ============================================ */
+
+/* --- Mensagem de erro inline (abaixo dos campos) --- */
+.field-error {
+  display: block;
+  font-size: var(--font-size-xs);
+  color: #DC2626;
+  font-weight: var(--font-weight-medium);
+  min-height: 1.1em;
+}
+
+/* --- Arquivo de referência (modo edição Tela 2) --- */
+.edit-reference {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  background-color: var(--color-surface);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.edit-reference__label {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+
+.edit-reference__filename {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-primary);
+  word-break: break-all;
+}
+
+/* --- Ações dos cards (Telas 3 e 4) --- */
+.card-actions {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  margin-top: var(--space-1);
+}
+
+.btn-edit-file,
+.btn-edit-result {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--space-2) var(--space-3);
+  background-color: var(--color-white);
+  border: 1.5px solid var(--color-secondary);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-secondary);
+  cursor: pointer;
+  transition: background-color var(--transition), color var(--transition);
+}
+
+.btn-edit-file:hover,
+.btn-edit-result:hover {
+  background-color: var(--color-secondary);
+  color: var(--color-primary);
+}
+
+.btn-delete-file,
+.btn-delete-result {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--space-2) var(--space-3);
+  background-color: var(--color-white);
+  border: 1.5px solid #EF4444;
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: #EF4444;
+  cursor: pointer;
+  transition: background-color var(--transition), color var(--transition);
+}
+
+.btn-delete-file:hover,
+.btn-delete-result:hover {
+  background-color: #EF4444;
+  color: var(--color-white);
+}
+
+/* --- Botão de perigo --- */
+.btn-danger {
+  background-color: #EF4444;
+  color: var(--color-white);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-danger:hover {
+  background-color: #DC2626;
+  box-shadow: var(--shadow-md);
+}
+
+/* --- Modal de confirmação de exclusão --- */
+.delete-modal {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(15, 23, 42, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: var(--space-4);
+  backdrop-filter: blur(2px);
+}
+
+.delete-modal__box {
+  background-color: var(--color-white);
+  border-radius: var(--radius-2xl);
+  padding: var(--space-6);
+  max-width: 340px;
+  width: 100%;
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.delete-modal__title {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+}
+
+.delete-modal__body {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+}
+
+.delete-modal__actions {
+  display: flex;
+  gap: var(--space-3);
+}
+
+.delete-modal__actions .btn {
+  flex: 1;
+  padding-block: var(--space-3);
+}
+
+/* --- Resumo de arquivos na Tela Inicial --- */
+.home-files-summary {
+  padding-inline: var(--space-4);
+  padding-bottom: var(--space-8);
+}
+
+.home-summary__text {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  text-align: center;
+  padding: var(--space-3) var(--space-4);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+}

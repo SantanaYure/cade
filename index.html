@@ -75,6 +75,11 @@
         </p>
       </section>
 
+      <!-- Resumo de arquivos (exibido quando há itens salvos) -->
+      <div class="home-files-summary container is-hidden" id="home-files-summary">
+        <p class="home-summary__text"></p>
+      </div>
+
     </div><!-- /screen-home -->
 
     <!-- ===== TELA 2: UPLOAD E NOMEAÇÃO ===== -->
@@ -92,15 +97,15 @@
 
         <!-- Intro -->
         <div class="upload-intro">
-          <h1 class="upload-intro__title">Adicionar arquivo</h1>
-          <p class="upload-intro__subtitle">Envie um documento e organize-o por categoria</p>
+          <h1 class="upload-intro__title" id="upload-intro-title">Adicionar arquivo</h1>
+          <p class="upload-intro__subtitle" id="upload-intro-subtitle">Envie um documento e organize-o por categoria</p>
         </div>
 
         <!-- Card do formulário -->
         <div class="upload-card">
 
           <!-- Área de upload -->
-          <div class="form-group">
+          <div class="form-group" id="upload-area-wrapper">
             <label class="upload-area" id="upload-area" for="upload-input">
               <input
                 type="file"
@@ -121,6 +126,13 @@
               </div>
             </label>
           </div>
+          <span class="field-error" id="error-file" role="alert"></span>
+
+          <!-- Arquivo de referência (modo edição) -->
+          <div class="edit-reference is-hidden" id="edit-reference-row">
+            <span class="edit-reference__label">Arquivo atual:</span>
+            <span class="edit-reference__filename" id="edit-reference-filename"></span>
+          </div>
 
           <!-- Nome do arquivo -->
           <div class="form-group">
@@ -135,6 +147,7 @@
               />
             </div>
           </div>
+          <span class="field-error" id="error-name" role="alert"></span>
 
           <!-- Categoria -->
           <div class="form-group">
@@ -154,6 +167,7 @@
               </button>
             </div>
           </div>
+          <span class="field-error" id="error-category" role="alert"></span>
 
           <!-- Etiqueta opcional -->
           <div class="form-group">
@@ -308,7 +322,6 @@
               class="results-search-input"
               placeholder="Busque por nome, tipo ou categoria"
               aria-label="Buscar arquivos"
-              value="currículo"
             />
           </div>
           <button type="submit" class="btn btn-primary results-search-btn">
@@ -339,6 +352,18 @@
 
       </main>
     </section><!-- /search-results-screen -->
+
+    <!-- Modal de confirmação de exclusão -->
+    <div class="delete-modal is-hidden" id="delete-modal" role="dialog" aria-modal="true" aria-labelledby="delete-modal-title">
+      <div class="delete-modal__box">
+        <p class="delete-modal__title" id="delete-modal-title">Excluir arquivo?</p>
+        <p class="delete-modal__body">Tem certeza que deseja excluir <strong id="delete-modal-name"></strong>?</p>
+        <div class="delete-modal__actions">
+          <button type="button" id="btn-delete-cancel" class="btn btn-secondary">Cancelar</button>
+          <button type="button" id="btn-delete-confirm" class="btn btn-danger">Excluir</button>
+        </div>
+      </div>
+    </div>
 
     <!-- JS -->
     <script src="src/js/main.js"></script>
