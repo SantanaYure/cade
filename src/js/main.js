@@ -289,7 +289,10 @@ const fileTagInput          = document.getElementById('file-tag');
 const uploadCategoryOpts    = document.querySelectorAll('.category-option');
 const uploadForm            = document.getElementById('upload-form');
 const btnBack               = document.getElementById('btn-back');
-const successMessage        = document.getElementById('success-message');
+const uploadSuccessPanel    = document.getElementById('upload-success-panel');
+const uploadSuccessTitle    = document.getElementById('upload-success-title');
+const btnSuccessViewFiles   = document.getElementById('btn-success-view-files');
+const btnSuccessAddAnother  = document.getElementById('btn-success-add-another');
 const uploadIntroTitle      = document.getElementById('upload-intro-title');
 const uploadIntroSubtitle   = document.getElementById('upload-intro-subtitle');
 const uploadAreaWrapper     = document.getElementById('upload-area-wrapper');
@@ -349,13 +352,24 @@ function resetUploadForm() {
   fileNameInput.closest('.form-input-wrapper')?.classList.remove('is-error');
   document.querySelector('.category-options')?.classList.remove('is-error');
   document.querySelectorAll('.field-error').forEach(el => (el.textContent = ''));
-  successMessage.classList.add('is-hidden');
+  uploadForm.classList.remove('is-hidden');
+  uploadSuccessPanel.classList.add('is-hidden');
 }
 
 btnBack.addEventListener('click', async () => {
   resetUploadForm();
   await renderHomeState();
   showScreen('home');
+});
+
+btnSuccessViewFiles.addEventListener('click', async () => {
+  resetUploadForm();
+  await renderHomeState();
+  showScreen('home');
+});
+
+btnSuccessAddAnother.addEventListener('click', () => {
+  resetUploadForm();
 });
 
 uploadInput.addEventListener('change', e => {
@@ -425,6 +439,7 @@ uploadForm.addEventListener('submit', async e => {
 
   if (!isValid) return;
 
+  const isEditing      = !!editingFileId;
   const targetCategory = selectedCategory;
 
   try {
@@ -457,13 +472,13 @@ uploadForm.addEventListener('submit', async e => {
 
     }
 
-    successMessage.classList.remove('is-hidden');
-
-    setTimeout(async () => {
-      resetUploadForm();
-      await renderHomeState();
-      await openCategoryScreen(targetCategory);
-    }, 1200);
+    await renderHomeState();
+    uploadForm.classList.add('is-hidden');
+    uploadSuccessTitle.textContent = isEditing
+      ? 'Arquivo atualizado com sucesso'
+      : 'Arquivo adicionado com sucesso';
+    btnSuccessAddAnother.classList.toggle('is-hidden', isEditing);
+    uploadSuccessPanel.classList.remove('is-hidden');
 
   } catch (err) {
     console.error('[Cadê?] Erro ao salvar arquivo:', err);
@@ -488,6 +503,8 @@ const fileList             = document.getElementById('file-list');
 const emptyFilterState     = document.getElementById('empty-filter-state');
 const btnCategoryBack      = document.getElementById('btn-category-back');
 const btnAddNew            = document.getElementById('btn-add-new');
+const btnEmptyCatAdd       = document.getElementById('btn-empty-cat-add');
+const btnEmptyFilterClear  = document.getElementById('btn-empty-filter-clear');
 
 btnCategoryBack.addEventListener('click', async () => {
   await renderHomeState();
@@ -495,6 +512,15 @@ btnCategoryBack.addEventListener('click', async () => {
 });
 
 btnAddNew.addEventListener('click', () => openCreateMode());
+
+btnEmptyCatAdd.addEventListener('click', () => openCreateMode());
+
+btnEmptyFilterClear.addEventListener('click', () => {
+  categoryFilterInput.value = '';
+  renderCategoryFiles();
+});
+
+document.getElementById('btn-empty-state-add').addEventListener('click', () => openCreateMode());
 
 categoryFilterInput.addEventListener('input', () => renderCategoryFiles());
 sortSelect.addEventListener('change', () => renderCategoryFiles());
@@ -545,12 +571,19 @@ async function renderCategoryFiles() {
       emptyFilterState.classList.remove('is-hidden');
       const titleEl    = emptyFilterState.querySelector('.empty-filter-state__title');
       const subtitleEl = emptyFilterState.querySelector('.empty-filter-state__subtitle');
+      const iconEl     = emptyFilterState.querySelector('.empty-filter-state__icon');
       if (total === 0 && !query) {
+        iconEl.textContent     = '📁';
         titleEl.textContent    = 'Nenhum arquivo nesta categoria';
-        subtitleEl.textContent = 'Adicione um novo arquivo para começar';
+        subtitleEl.textContent = 'Adicione um arquivo e organize-o nesta categoria.';
+        btnEmptyCatAdd.classList.remove('is-hidden');
+        btnEmptyFilterClear.classList.add('is-hidden');
       } else {
-        titleEl.textContent    = 'Nenhum arquivo encontrado nesta categoria';
+        iconEl.textContent     = '🔍';
+        titleEl.textContent    = 'Nenhum arquivo encontrado';
         subtitleEl.textContent = 'Tente buscar por outro nome, tipo ou etiqueta';
+        btnEmptyCatAdd.classList.add('is-hidden');
+        btnEmptyFilterClear.classList.remove('is-hidden');
       }
     } else {
       emptyFilterState.classList.add('is-hidden');
@@ -620,17 +653,24 @@ fileList.addEventListener('click', async e => {
 //  TELA 4: RESULTADO DA BUSCA
 // ══════════════════════════════════════════════
 
-const resultsSearchForm  = document.getElementById('results-search-form');
-const resultsSearchInput = document.getElementById('results-search-input');
-const resultsFeedback    = document.getElementById('results-feedback');
-const resultsTermDisplay = document.getElementById('results-term-display');
-const searchResultsList  = document.getElementById('search-results-list');
-const emptyResultsState  = document.getElementById('empty-results-state');
-const btnSearchBack      = document.getElementById('btn-search-back');
+const resultsSearchForm   = document.getElementById('results-search-form');
+const resultsSearchInput  = document.getElementById('results-search-input');
+const resultsFeedback     = document.getElementById('results-feedback');
+const resultsTermDisplay  = document.getElementById('results-term-display');
+const resultsCountDisplay = document.getElementById('results-count-display');
+const searchResultsList   = document.getElementById('search-results-list');
+const emptyResultsState   = document.getElementById('empty-results-state');
+const btnSearchBack       = document.getElementById('btn-search-back');
+const btnClearSearch      = document.getElementById('btn-clear-search');
 
 btnSearchBack.addEventListener('click', async () => {
   await renderHomeState();
   showScreen('home');
+});
+
+btnClearSearch.addEventListener('click', () => {
+  resultsSearchInput.value = '';
+  renderSearchResults('');
 });
 
 resultsSearchForm.addEventListener('submit', e => {
@@ -660,6 +700,8 @@ async function renderSearchResults(term) {
 
     if (query && results.length > 0) {
       resultsTermDisplay.textContent = term;
+      const n = results.length;
+      resultsCountDisplay.textContent = `${n} arquivo${n !== 1 ? 's' : ''} encontrado${n !== 1 ? 's' : ''}`;
       resultsFeedback.classList.remove('is-hidden');
     } else {
       resultsFeedback.classList.add('is-hidden');
@@ -667,6 +709,7 @@ async function renderSearchResults(term) {
 
     if (results.length === 0) {
       searchResultsList.innerHTML = '';
+      btnClearSearch.classList.toggle('is-hidden', !term);
       emptyResultsState.classList.remove('is-hidden');
     } else {
       emptyResultsState.classList.add('is-hidden');

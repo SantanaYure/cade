@@ -676,9 +676,10 @@
   font-weight: var(--font-weight-bold);
 }
 
-.results-feedback__hint {
+.results-feedback__count {
   font-size: var(--font-size-xs);
   color: var(--color-text-secondary);
+  font-weight: var(--font-weight-medium);
 }
 
 /* --- Lista de resultados --- */

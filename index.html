@@ -71,8 +71,11 @@
         <div class="empty-state__icon">📂</div>
         <p class="empty-state__title">Você ainda não adicionou arquivos</p>
         <p class="empty-state__subtitle">
-          Comece enviando um documento ou acessando uma categoria
+          Comece enviando um documento ou escolha uma categoria
         </p>
+        <button id="btn-empty-state-add" type="button" class="btn btn-primary">
+          + Adicionar arquivo
+        </button>
       </section>
 
       <!-- Resumo de arquivos (exibido quando há itens salvos) -->
@@ -186,12 +189,6 @@
             </div>
           </div>
 
-          <!-- Mensagem de sucesso -->
-          <div class="success-message is-hidden" id="success-message" role="alert" aria-live="polite">
-            <span class="success-message__icon" aria-hidden="true">✅</span>
-            <span>Arquivo salvo com sucesso</span>
-          </div>
-
         </div><!-- /upload-card -->
 
         <!-- Ações -->
@@ -199,6 +196,17 @@
           <button id="btn-back" type="button" class="btn btn-secondary btn-full">Voltar</button>
         </div>
         </form>
+
+        <!-- Painel de sucesso (exibido após salvar) -->
+        <div class="upload-success-panel is-hidden" id="upload-success-panel" role="status" aria-live="polite">
+          <div class="upload-success-panel__icon" aria-hidden="true">✅</div>
+          <h2 class="upload-success-panel__title" id="upload-success-title">Arquivo adicionado com sucesso</h2>
+          <p class="upload-success-panel__subtitle">Seu arquivo foi salvo e já está disponível na sua biblioteca.</p>
+          <div class="upload-success-panel__actions">
+            <button id="btn-success-view-files" type="button" class="btn btn-primary btn-full">Ver arquivos</button>
+            <button id="btn-success-add-another" type="button" class="btn btn-secondary btn-full">Adicionar outro</button>
+          </div>
+        </div>
 
       </main>
     </section><!-- /upload-screen -->
@@ -274,6 +282,8 @@
           <div class="empty-filter-state__icon" aria-hidden="true">🔍</div>
           <p class="empty-filter-state__title">Nenhum arquivo encontrado nesta categoria</p>
           <p class="empty-filter-state__subtitle">Tente buscar por outro nome, tipo ou etiqueta</p>
+          <button id="btn-empty-cat-add" type="button" class="btn btn-primary is-hidden">+ Adicionar arquivo</button>
+          <button id="btn-empty-filter-clear" type="button" class="btn btn-secondary is-hidden">Limpar filtro</button>
         </div>
 
         <!-- Ação -->
@@ -336,7 +346,7 @@
             Resultado para:
             <span id="results-term-display" class="results-feedback__highlight"></span>
           </p>
-          <p class="results-feedback__hint">Arquivo encontrado rapidamente por nome e etiqueta</p>
+          <p class="results-feedback__count" id="results-count-display"></p>
         </div>
 
         <!-- Lista de resultados (preenchida pelo JS) -->
@@ -345,10 +355,11 @@
         <!-- Estado vazio -->
         <div class="empty-results-state is-hidden" id="empty-results-state" role="status">
           <div class="empty-results-state__icon" aria-hidden="true">🔍</div>
-          <p class="empty-results-state__title">Nenhum resultado encontrado</p>
+          <p class="empty-results-state__title">Nenhum arquivo encontrado</p>
           <p class="empty-results-state__subtitle">
             Tente buscar por outro nome, tipo, categoria ou etiqueta
           </p>
+          <button id="btn-clear-search" type="button" class="btn btn-secondary">Limpar busca</button>
         </div>
 
       </main>
