@@ -40,14 +40,42 @@ let simulatedFiles = [
     data: '02/05/2026',
     timestamp: Date.parse('2026-05-02'),
   },
+  {
+    id: 4,
+    nome: 'Currículo Bruna 2026',
+    tipo: 'pdf',
+    categoria: 'trabalho',
+    etiqueta: 'Currículo',
+    data: '06/05/2026',
+    timestamp: Date.parse('2026-05-06'),
+  },
+  {
+    id: 5,
+    nome: 'Currículo atualizado tecnologia',
+    tipo: 'docx',
+    categoria: 'trabalho',
+    etiqueta: 'Currículo',
+    data: '04/05/2026',
+    timestamp: Date.parse('2026-05-04'),
+  },
+  {
+    id: 6,
+    nome: 'Modelo de currículo acadêmico',
+    tipo: 'pdf',
+    categoria: 'academico',
+    etiqueta: 'Currículo',
+    data: '28/04/2026',
+    timestamp: Date.parse('2026-04-28'),
+  },
 ];
 
-let nextFileId = 4;
+let nextFileId = 7;
 
 // ─── Referências: telas ───────────────────────
-const screenHome     = document.querySelector('.screen-home');
-const uploadScreen   = document.getElementById('upload-screen');
-const categoryScreen = document.getElementById('category-screen');
+const screenHome          = document.querySelector('.screen-home');
+const uploadScreen        = document.getElementById('upload-screen');
+const categoryScreen      = document.getElementById('category-screen');
+const searchResultsScreen = document.getElementById('search-results-screen');
 
 // ─── Referências: Tela Inicial ────────────────
 const btnAddFile    = document.getElementById('btn-add-file');
@@ -79,6 +107,15 @@ const emptyFilterState     = document.getElementById('empty-filter-state');
 const btnCategoryBack      = document.getElementById('btn-category-back');
 const btnAddNew            = document.getElementById('btn-add-new');
 
+// ─── Referências: Tela 4 ─────────────────────
+const resultsSearchForm  = document.getElementById('results-search-form');
+const resultsSearchInput = document.getElementById('results-search-input');
+const resultsFeedback    = document.getElementById('results-feedback');
+const resultsTermDisplay = document.getElementById('results-term-display');
+const searchResultsList  = document.getElementById('search-results-list');
+const emptyResultsState  = document.getElementById('empty-results-state');
+const btnSearchBack      = document.getElementById('btn-search-back');
+
 // ─── Estado da aplicação ──────────────────────
 let selectedFile        = null;
 let selectedCategory    = null;
@@ -88,7 +125,12 @@ let currentCategoryView = 'pessoal';
 //  NAVEGAÇÃO
 // ════════════════════════════════════════════════
 
-const SCREENS = { home: screenHome, upload: uploadScreen, category: categoryScreen };
+const SCREENS = {
+  home:          screenHome,
+  upload:        uploadScreen,
+  category:      categoryScreen,
+  searchResults: searchResultsScreen,
+};
 
 function showScreen(name) {
   Object.values(SCREENS).forEach((s) => s.classList.add('is-hidden'));
@@ -111,7 +153,11 @@ searchInput.addEventListener('input', (e) => {
 
 searchInput.addEventListener('keydown', (e) => {
   if (e.key === 'Enter') {
-    console.log(`[Cadê?] Busca enviada: "${e.target.value.trim()}"`);
+    const query = e.target.value.trim();
+    if (query) {
+      console.log(`[Cadê?] Busca enviada: "${query}"`);
+      openSearchResultsScreen(query);
+    }
   }
 });
 
@@ -382,6 +428,114 @@ function buildFileCardHTML(file) {
   `;
 }
 
+// ════════════════════════════════════════════════
+//  TELA 4: RESULTADO DA BUSCA
+// ════════════════════════════════════════════════
+
+btnSearchBack.addEventListener('click', () => {
+  console.log('[Cadê?] Voltando para a Tela Inicial.');
+  showScreen('home');
+});
+
+resultsSearchForm.addEventListener('submit', (e) => {
+  e.preventDefault();
+  const query = resultsSearchInput.value.trim();
+  console.log(`[Cadê?] Nova busca na Tela 4: "${query}"`);
+  runSearch();
+});
+
+// Delegação de eventos nos cards de resultado
+searchResultsList.addEventListener('click', (e) => {
+  const openBtn = e.target.closest('.btn-open-result');
+  const catBtn  = e.target.closest('.btn-ver-categoria');
+
+  if (openBtn) {
+    const name = openBtn.closest('.result-card').querySelector('.result-card__name').textContent;
+    console.log(`[Cadê?] Abrir arquivo: "${name}" (protótipo — sem ação real)`);
+  }
+
+  if (catBtn) {
+    const card     = catBtn.closest('.result-card');
+    const category = card.dataset.categoria;
+    console.log(`[Cadê?] Ver categoria: "${CATEGORIES[category]?.label || category}"`);
+    openCategoryScreen(category);
+  }
+});
+
+function openSearchResultsScreen(query) {
+  resultsSearchInput.value = query || '';
+  runSearch();
+  showScreen('searchResults');
+}
+
+function runSearch() {
+  const raw   = resultsSearchInput.value.trim();
+  const query = raw.toLowerCase();
+
+  let files = query
+    ? simulatedFiles.filter((f) =>
+        f.nome.toLowerCase().includes(query)             ||
+        f.tipo.toLowerCase().includes(query)             ||
+        (f.etiqueta || '').toLowerCase().includes(query) ||
+        (CATEGORIES[f.categoria]?.label || '').toLowerCase().includes(query)
+      )
+    : [...simulatedFiles];
+
+  // Feedback: visível apenas quando há query E resultados
+  if (query && files.length > 0) {
+    resultsTermDisplay.textContent = raw;
+    resultsFeedback.classList.remove('is-hidden');
+  } else {
+    resultsFeedback.classList.add('is-hidden');
+  }
+
+  if (query && files.length === 0) {
+    searchResultsList.innerHTML = '';
+    emptyResultsState.classList.remove('is-hidden');
+  } else {
+    emptyResultsState.classList.add('is-hidden');
+    searchResultsList.innerHTML = files.map(buildResultCardHTML).join('');
+  }
+}
+
+function buildResultCardHTML(file) {
+  const cat       = CATEGORIES[file.categoria] || { label: file.categoria, icon: '📁' };
+  const typeClass = `result-card__type-badge--${escapeHTML(file.tipo)}`;
+  const typeLabel = file.tipo.toUpperCase();
+  const tagHTML   = file.etiqueta
+    ? `<div class="result-meta__item">
+         <span class="result-meta__label">Etiqueta:</span>
+         <span class="result-tag">${escapeHTML(file.etiqueta)}</span>
+       </div>`
+    : '';
+
+  return `
+    <article class="result-card" role="listitem" data-id="${file.id}" data-categoria="${escapeHTML(file.categoria)}">
+      <div class="result-card__header">
+        <span class="result-card__type-badge ${typeClass}">${escapeHTML(typeLabel)}</span>
+        <time class="result-card__date">${escapeHTML(file.data)}</time>
+      </div>
+      <h3 class="result-card__name">${escapeHTML(file.nome)}</h3>
+      <div class="result-meta">
+        <div class="result-meta__item">
+          <span class="result-meta__label">Categoria:</span>
+          <span class="result-meta__value">${escapeHTML(cat.icon)} ${escapeHTML(cat.label)}</span>
+        </div>
+        ${tagHTML}
+      </div>
+      <div class="result-actions">
+        <button type="button" class="btn-open-result" aria-label="Abrir arquivo ${escapeHTML(file.nome)}">
+          Abrir arquivo →
+        </button>
+        <button type="button" class="btn-ver-categoria" aria-label="Ver arquivos de ${escapeHTML(cat.label)}">
+          Ver categoria
+        </button>
+      </div>
+    </article>
+  `;
+}
+
+// ─── Utilitário: escapar HTML ─────────────────
 function escapeHTML(str) {
   if (str == null) return '';
   return String(str)

@@ -271,6 +271,75 @@
       </main>
     </section><!-- /category-screen -->
 
+    <!-- ===== TELA 4: RESULTADO DA BUSCA ===== -->
+    <section id="search-results-screen" class="screen search-results-screen is-hidden">
+
+      <!-- Header -->
+      <header class="search-results-header">
+        <div class="container">
+          <span class="logo">Cadê?</span>
+        </div>
+      </header>
+
+      <!-- Conteúdo principal -->
+      <main class="search-results-main container">
+
+        <!-- Navegação de retorno -->
+        <nav class="search-results-nav" aria-label="Navegação">
+          <button id="btn-search-back" type="button" class="btn-back-link">
+            ← Voltar
+          </button>
+        </nav>
+
+        <!-- Intro -->
+        <div class="search-results-intro">
+          <h1 class="search-results-intro__title">Resultado da busca</h1>
+          <p class="search-results-intro__subtitle">
+            Encontre rapidamente arquivos salvos por nome, tipo, categoria ou etiqueta
+          </p>
+        </div>
+
+        <!-- Formulário de busca -->
+        <form class="results-search-form" id="results-search-form" role="search" novalidate>
+          <div class="results-search-field">
+            <input
+              type="search"
+              id="results-search-input"
+              class="results-search-input"
+              placeholder="Busque por nome, tipo ou categoria"
+              aria-label="Buscar arquivos"
+              value="currículo"
+            />
+          </div>
+          <button type="submit" class="btn btn-primary results-search-btn">
+            Buscar
+          </button>
+        </form>
+
+        <!-- Feedback da busca -->
+        <div class="results-feedback is-hidden" id="results-feedback" aria-live="polite">
+          <p class="results-feedback__term">
+            Resultado para:
+            <span id="results-term-display" class="results-feedback__highlight"></span>
+          </p>
+          <p class="results-feedback__hint">Arquivo encontrado rapidamente por nome e etiqueta</p>
+        </div>
+
+        <!-- Lista de resultados (preenchida pelo JS) -->
+        <div class="search-results-list" id="search-results-list" role="list" aria-label="Resultados da busca"></div>
+
+        <!-- Estado vazio -->
+        <div class="empty-results-state is-hidden" id="empty-results-state" role="status">
+          <div class="empty-results-state__icon" aria-hidden="true">🔍</div>
+          <p class="empty-results-state__title">Nenhum resultado encontrado</p>
+          <p class="empty-results-state__subtitle">
+            Tente buscar por outro nome, tipo, categoria ou etiqueta
+          </p>
+        </div>
+
+      </main>
+    </section><!-- /search-results-screen -->
+
     <!-- JS -->
     <script src="src/js/main.js"></script>
   </body>
