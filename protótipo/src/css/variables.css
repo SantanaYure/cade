@@ -17,6 +17,11 @@
   --color-border:         #E2E8F0;
   --color-bg-dark:        #0F172A;
 
+  --danger:               #EF4444;
+  --warning:              #F59E0B;
+  --success: #22C55E;
+
+
   /* --- Tipografia --- */
   --font-family:   'Inter', system-ui, -apple-system, sans-serif;
   --font-size-xs:  0.75rem;   /* 12px */
