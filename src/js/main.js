@@ -76,6 +76,59 @@ function getAllFileRecords() {
   });
 }
 
+async function getAllFiles() {
+  return await getAllFileRecords();
+}
+
+function normalizeText(text) {
+  return (text || '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .trim();
+}
+
+function diceCoefficient(a, b) {
+  a = normalizeText(a);
+  b = normalizeText(b);
+
+  if (!a || !b) return 0;
+  if (a === b) return 1;
+
+  const bigrams = str => {
+    const result = [];
+
+    for (let i = 0; i < str.length - 1; i++) {
+      result.push(str.slice(i, i + 2));
+    }
+
+    return result;
+  };
+
+  const aBigrams = bigrams(a);
+  const bBigrams = bigrams(b);
+
+  if (aBigrams.length === 0 || bBigrams.length === 0) {
+    return 0;
+  }
+
+  let matches = 0;
+  const used = [];
+
+  aBigrams.forEach(bg => {
+    const index = bBigrams.findIndex(
+      (item, i) => item === bg && !used.includes(i)
+    );
+
+    if (index !== -1) {
+      matches++;
+      used.push(index);
+    }
+  });
+
+  return (2 * matches) / (aBigrams.length + bBigrams.length);
+}
+
 function getFileRecordById(id) {
   return new Promise((resolve, reject) => {
     const tx    = db.transaction(STORE_NAME, 'readonly');
@@ -685,18 +738,25 @@ async function openSearchResultsScreen(query) {
 }
 
 async function renderSearchResults(term) {
-  try {
-    const query   = (term || '').toLowerCase().trim();
+  try {   
+    const query = (term || '').toLowerCase().trim();
     const allFiles = await getAllFileRecords();
-    let results   = query
-      ? allFiles.filter(f =>
-          f.displayName.toLowerCase().includes(query)                          ||
-          (f.originalFileName || '').toLowerCase().includes(query)             ||
-          f.fileType.toLowerCase().includes(query)                             ||
-          (CATEGORIES[f.category]?.label || '').toLowerCase().includes(query)  ||
-          (f.tag || '').toLowerCase().includes(query)
-        )
-      : [...allFiles];
+
+    let results = query
+  ? allFiles.filter(f => {
+      const nameSimilarity = diceCoefficient(query, f.displayName);
+
+      return (
+        f.displayName.toLowerCase().includes(query) ||
+        (f.originalFileName || '').toLowerCase().includes(query) ||
+        f.fileType.toLowerCase().includes(query) ||
+        (CATEGORIES[f.category]?.label || '').toLowerCase().includes(query) ||
+        (f.tag || '').toLowerCase().includes(query) ||
+        nameSimilarity >= 0.6
+      );
+    })
+  : [...allFiles];
+
 
     if (query && results.length > 0) {
       resultsTermDisplay.textContent = term;
