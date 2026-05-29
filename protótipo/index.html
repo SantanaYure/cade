@@ -11,7 +11,13 @@
     <link rel="stylesheet" href="src/css/components.css" />
     <link rel="stylesheet" href="src/css/home.css" />
   </head>
+
   <body>
+
+    <!-- ALERTA DUPLICIDADE -->
+    <div id="duplicate-alert" class="duplicate-alert is-hidden" role="alert">
+      ⚠️ Já existe um arquivo com esse nome
+    </div>
 
     <!-- ===== TELA INICIAL ===== -->
     <div class="screen screen-home">
@@ -55,10 +61,12 @@
             <span class="category-card__icon">🏠</span>
             <span class="category-card__label">Pessoal</span>
           </button>
+
           <button class="category-card" data-category="academico">
             <span class="category-card__icon">🎓</span>
             <span class="category-card__label">Acadêmico</span>
           </button>
+
           <button class="category-card" data-category="trabalho">
             <span class="category-card__icon">💼</span>
             <span class="category-card__label">Trabalho</span>
@@ -101,7 +109,9 @@
         <!-- Intro -->
         <div class="upload-intro">
           <h1 class="upload-intro__title" id="upload-intro-title">Adicionar arquivo</h1>
-          <p class="upload-intro__subtitle" id="upload-intro-subtitle">Envie um documento e organize-o por categoria</p>
+          <p class="upload-intro__subtitle" id="upload-intro-subtitle">
+            Envie um documento e organize-o por categoria
+          </p>
         </div>
 
         <!-- Card do formulário -->
@@ -116,100 +126,87 @@
                 id="upload-input"
                 class="upload-input"
                 accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,image/*"
-                aria-label="Selecionar arquivo"
               />
+
               <div class="upload-area__content" id="upload-content">
-                <span class="upload-area__icon" aria-hidden="true">📎</span>
+                <span class="upload-area__icon">📎</span>
                 <span class="upload-area__text">Toque ou clique para selecionar um arquivo</span>
                 <span class="upload-area__hint">PDF, imagem ou documento</span>
               </div>
-              <div class="upload-area__selected is-hidden" id="upload-selected">
-                <span class="upload-area__selected-icon" aria-hidden="true">📄</span>
-                <span id="filename-text" class="upload-area__filename"></span>
-                <span class="upload-area__change-hint">Clique para trocar</span>
-              </div>
             </label>
           </div>
-          <span class="field-error" id="error-file" role="alert"></span>
 
-          <!-- Arquivo de referência (modo edição) -->
-          <div class="edit-reference is-hidden" id="edit-reference-row">
-            <span class="edit-reference__label">Arquivo atual:</span>
-            <span class="edit-reference__filename" id="edit-reference-filename"></span>
-          </div>
+          <span class="field-error" id="error-file"></span>
 
           <!-- Nome do arquivo -->
           <div class="form-group">
             <label class="form-label" for="file-name">Nome do arquivo</label>
-            <div class="form-input-wrapper">
-              <input
-                type="text"
-                id="file-name"
-                class="form-input"
-                placeholder="Comprovante de residência 2026"
-                maxlength="100"
-              />
-            </div>
+            <input
+              type="text"
+              id="file-name"
+              class="form-input"
+              placeholder="Comprovante de residência 2026"
+            />
           </div>
-          <span class="field-error" id="error-name" role="alert"></span>
+
+          <span class="field-error" id="error-name"></span>
 
           <!-- Categoria -->
           <div class="form-group">
             <span class="form-label">Categoria</span>
-            <div class="category-options" role="radiogroup" aria-label="Escolha uma categoria">
-              <button type="button" class="category-option" data-category="pessoal" role="radio" aria-checked="false">
-                <span aria-hidden="true">🏠</span>
-                Pessoal
-              </button>
-              <button type="button" class="category-option" data-category="academico" role="radio" aria-checked="false">
-                <span aria-hidden="true">🎓</span>
-                Acadêmico
-              </button>
-              <button type="button" class="category-option" data-category="trabalho" role="radio" aria-checked="false">
-                <span aria-hidden="true">💼</span>
-                Trabalho
-              </button>
+
+            <div class="category-options">
+              <button type="button" class="category-option" data-category="pessoal">🏠 Pessoal</button>
+              <button type="button" class="category-option" data-category="academico">🎓 Acadêmico</button>
+              <button type="button" class="category-option" data-category="trabalho">💼 Trabalho</button>
             </div>
           </div>
-          <span class="field-error" id="error-category" role="alert"></span>
+
+          <span class="field-error" id="error-category"></span>
 
           <!-- Etiqueta opcional -->
           <div class="form-group">
             <label class="form-label" for="file-tag">
               Etiqueta <span class="form-label--optional">(opcional)</span>
             </label>
-            <div class="form-input-wrapper">
-              <input
-                type="text"
-                id="file-tag"
-                class="form-input"
-                placeholder="CNH, matrícula, currículo, contrato"
-                maxlength="50"
-              />
-            </div>
+
+            <input
+              type="text"
+              id="file-tag"
+              class="form-input"
+              placeholder="CNH, contrato, currículo..."
+            />
           </div>
 
-        </div><!-- /upload-card -->
+        </div>
 
         <!-- Ações -->
         <div class="upload-actions">
-          <button id="btn-back" type="button" class="btn btn-secondary btn-full">Voltar</button>
+          <button id="btn-back" type="button" class="btn btn-secondary btn-full">
+            Voltar
+          </button>
         </div>
+
         </form>
 
-        <!-- Painel de sucesso (exibido após salvar) -->
-        <div class="upload-success-panel is-hidden" id="upload-success-panel" role="status" aria-live="polite">
-          <div class="upload-success-panel__icon" aria-hidden="true">✅</div>
-          <h2 class="upload-success-panel__title" id="upload-success-title">Arquivo adicionado com sucesso</h2>
-          <p class="upload-success-panel__subtitle">Seu arquivo foi salvo e já está disponível na sua biblioteca.</p>
+        <!-- Painel deSUCESSO -->
+        <div class="upload-success-panel is-hidden" id="upload-success-panel">
+          <div class="upload-success-panel__icon">✅</div>
+          <h2>Arquivo adicionado com sucesso</h2>
+
           <div class="upload-success-panel__actions">
-            <button id="btn-success-view-files" type="button" class="btn btn-primary btn-full">Ver arquivos</button>
-            <button id="btn-success-add-another" type="button" class="btn btn-secondary btn-full">Adicionar outro</button>
+            <button id="btn-success-view-files" class="btn btn-primary btn-full">
+              Ver arquivos
+            </button>
+
+            <button id="btn-success-add-another" class="btn btn-secondary btn-full">
+              Adicionar outro
+            </button>
           </div>
         </div>
 
       </main>
-    </section><!-- /upload-screen -->
+    </section>
 
     <!-- ===== TELA 3: VISUALIZAÇÃO POR CATEGORIA ===== -->
     <section id="category-screen" class="screen category-screen is-hidden">
@@ -224,156 +221,72 @@
       <!-- Conteúdo principal -->
       <main class="category-main container">
 
-        <!-- Navegação de retorno -->
-        <nav class="category-nav" aria-label="Navegação">
-          <button id="btn-category-back" type="button" class="btn-back-link">
-            ← Voltar
-          </button>
+        <nav>
+          <button id="btn-category-back" class="btn-back-link">← Voltar</button>
         </nav>
 
-        <!-- Intro -->
-        <div class="category-intro">
-          <h1 class="category-intro__title">Arquivos por categoria</h1>
-          <p class="category-intro__subtitle">
-            Categoria selecionada:
-            <span id="category-name-display" class="category-intro__name">Pessoal</span>
-          </p>
-        </div>
+        <h1>Arquivos por categoria</h1>
 
-        <!-- Resumo da categoria -->
         <div class="category-summary">
-          <span class="category-summary__icon" id="category-summary-icon" aria-hidden="true">🏠</span>
-          <div class="category-summary__info">
-            <span class="category-summary__label" id="category-summary-label">Pessoal</span>
-            <span class="category-summary__count" id="category-summary-count">3 arquivos</span>
-          </div>
+          <span id="category-summary-icon">🏠</span>
+          <span id="category-summary-label">Pessoal</span>
+          <span id="category-summary-count"></span>
         </div>
 
-        <!-- Toolbar: Filtro + Ordenação -->
         <div class="category-toolbar">
-          <div class="category-filter">
-            <div class="search-bar">
-              <input
-                type="search"
-                id="category-filter-input"
-                class="search-bar__input"
-                placeholder="Filtrar nesta categoria"
-                aria-label="Filtrar arquivos nesta categoria"
-              />
-            </div>
-          </div>
-          <div class="sort-group">
-            <label class="form-label" for="sort-select">Ordenar por</label>
-            <div class="sort-select-wrapper">
-              <select id="sort-select" class="sort-select">
-                <option value="recent">Mais recentes</option>
-                <option value="name">Nome A-Z</option>
-                <option value="type">Tipo de arquivo</option>
-              </select>
-            </div>
-          </div>
+          <input
+            type="search"
+            id="category-filter-input"
+            placeholder="Filtrar nesta categoria"
+          />
+
+          <select id="sort-select">
+            <option value="recent">Mais recentes</option>
+            <option value="name">Nome A-Z</option>
+            <option value="type">Tipo</option>
+          </select>
         </div>
 
-        <!-- Lista de arquivos (preenchida pelo JS) -->
-        <div class="file-list" id="file-list" role="list" aria-label="Arquivos da categoria"></div>
-
-        <!-- Estado vazio do filtro -->
-        <div class="empty-filter-state is-hidden" id="empty-filter-state" role="status">
-          <div class="empty-filter-state__icon" aria-hidden="true">🔍</div>
-          <p class="empty-filter-state__title">Nenhum arquivo encontrado nesta categoria</p>
-          <p class="empty-filter-state__subtitle">Tente buscar por outro nome, tipo ou etiqueta</p>
-          <button id="btn-empty-cat-add" type="button" class="btn btn-primary is-hidden">+ Adicionar arquivo</button>
-          <button id="btn-empty-filter-clear" type="button" class="btn btn-secondary is-hidden">Limpar filtro</button>
-        </div>
-
-        <!-- Ação -->
-        <div class="category-actions">
-          <button id="btn-add-new" type="button" class="btn btn-primary btn-full">
-            + Adicionar novo arquivo
-          </button>
+        <div id="file-list" class="file-list"></div>
+        <div id="duplicate-alert" class="duplicate-alert is-hidden">
+          ⚠️ Arquivo duplicado 
         </div>
 
       </main>
-    </section><!-- /category-screen -->
+    </section>
 
     <!-- ===== TELA 4: RESULTADO DA BUSCA ===== -->
     <section id="search-results-screen" class="screen search-results-screen is-hidden">
 
-      <!-- Header -->
-      <header class="search-results-header">
-        <div class="container">
-          <span class="logo">Cadê?</span>
-        </div>
+      <header>
+        <span class="logo">Cadê?</span>
       </header>
 
-      <!-- Conteúdo principal -->
-      <main class="search-results-main container">
+      <main class="container">
 
-        <!-- Navegação de retorno -->
-        <nav class="search-results-nav" aria-label="Navegação">
-          <button id="btn-search-back" type="button" class="btn-back-link">
-            ← Voltar
-          </button>
-        </nav>
+        <button id="btn-search-back" class="btn-back-link">← Voltar</button>
 
-        <!-- Intro -->
-        <div class="search-results-intro">
-          <h1 class="search-results-intro__title">Resultado da busca</h1>
-          <p class="search-results-intro__subtitle">
-            Encontre rapidamente arquivos salvos por nome, tipo, categoria ou etiqueta
-          </p>
-        </div>
+        <h1>Resultado da busca</h1>
 
-        <!-- Formulário de busca -->
-        <form class="results-search-form" id="results-search-form" role="search" novalidate>
-          <div class="results-search-field">
-            <input
-              type="search"
-              id="results-search-input"
-              class="results-search-input"
-              placeholder="Busque por nome, tipo ou categoria"
-              aria-label="Buscar arquivos"
-            />
-          </div>
-          <button type="submit" class="btn btn-primary results-search-btn">
-            Buscar
-          </button>
-        </form>
+        <input
+          type="search"
+          id="results-search-input"
+          placeholder="Buscar arquivos"
+        />
 
-        <!-- Feedback da busca -->
-        <div class="results-feedback is-hidden" id="results-feedback" aria-live="polite">
-          <p class="results-feedback__term">
-            Resultado para:
-            <span id="results-term-display" class="results-feedback__highlight"></span>
-          </p>
-          <p class="results-feedback__count" id="results-count-display"></p>
-        </div>
-
-        <!-- Lista de resultados (preenchida pelo JS) -->
-        <div class="search-results-list" id="search-results-list" role="list" aria-label="Resultados da busca"></div>
-
-        <!-- Estado vazio -->
-        <div class="empty-results-state is-hidden" id="empty-results-state" role="status">
-          <div class="empty-results-state__icon" aria-hidden="true">🔍</div>
-          <p class="empty-results-state__title">Nenhum arquivo encontrado</p>
-          <p class="empty-results-state__subtitle">
-            Tente buscar por outro nome, tipo, categoria ou etiqueta
-          </p>
-          <button id="btn-clear-search" type="button" class="btn btn-secondary">Limpar busca</button>
-        </div>
+        <div id="search-results-list"></div>
 
       </main>
-    </section><!-- /search-results-screen -->
+    </section>
 
-    <!-- Modal de confirmação de exclusão -->
-    <div class="delete-modal is-hidden" id="delete-modal" role="dialog" aria-modal="true" aria-labelledby="delete-modal-title">
+    <!-- Modal exclusão -->
+    <div id="delete-modal" class="delete-modal is-hidden">
       <div class="delete-modal__box">
-        <p class="delete-modal__title" id="delete-modal-title">Excluir arquivo?</p>
-        <p class="delete-modal__body">Tem certeza que deseja excluir <strong id="delete-modal-name"></strong>?</p>
-        <div class="delete-modal__actions">
-          <button type="button" id="btn-delete-cancel" class="btn btn-secondary">Cancelar</button>
-          <button type="button" id="btn-delete-confirm" class="btn btn-danger">Excluir</button>
-        </div>
+        <p>Excluir arquivo?</p>
+        <strong id="delete-modal-name"></strong>
+
+        <button id="btn-delete-cancel">Cancelar</button>
+        <button id="btn-delete-confirm">Excluir</button>
       </div>
     </div>
 
