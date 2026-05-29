@@ -94,3 +94,35 @@ img {
 ul, ol {
   list-style: none;
 }
+
+/* ============================================
+   EXTENSÕES — estados globais SPA
+   ============================================ */
+
+.highlight {
+  background-color: var(--color-primary);
+  color: var(--color-secondary);
+  padding: 0 2px;
+  border-radius: var(--radius-sm);
+}
+
+.loading {
+  opacity: 0.6;
+  pointer-events: none;
+  filter: blur(0.3px);
+}
+
+.screen {
+  animation: fadeIn 0.25s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

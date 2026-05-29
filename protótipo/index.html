@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cadê?</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="src/css/variables.css" />
+    <link rel="stylesheet" href="src/css/base.css" />
+    <link rel="stylesheet" href="src/css/components.css" />
+    <link rel="stylesheet" href="src/css/home.css" />
+  </head>
+
+  <body>
+
+    <!-- ALERTA DUPLICIDADE -->
+    <div id="duplicate-alert" class="duplicate-alert is-hidden" role="alert">
+      ⚠️ Já existe um arquivo com esse nome
+    </div>
+
+    <!-- ===== TELA INICIAL ===== -->
+    <div class="screen screen-home">
+
+      <!-- Header -->
+      <header class="home-header">
+        <div class="container">
+          <span class="logo">Cadê?</span>
+        </div>
+      </header>
+
+      <!-- Hero -->
+      <section class="hero container">
+        <h1 class="hero__title">Encontre seus arquivos em segundos</h1>
+        <p class="hero__subtitle">
+          Organize documentos pessoais, acadêmicos e profissionais em um só lugar
+        </p>
+
+        <!-- Barra de busca -->
+        <div class="search-bar">
+          <input
+            id="search-input"
+            type="search"
+            class="search-bar__input"
+            placeholder="Busque por nome, tipo ou categoria"
+            aria-label="Buscar arquivos"
+          />
+        </div>
+
+        <!-- Botão principal -->
+        <button id="btn-add-file" class="btn btn-primary">
+          + Adicionar arquivo
+        </button>
+      </section>
+
+      <!-- Categorias -->
+      <section class="categories container">
+        <h2 class="categories__title">Categorias</h2>
+        <div class="categories__grid">
+          <button class="category-card" data-category="pessoal">
+            <span class="category-card__icon">🏠</span>
+            <span class="category-card__label">Pessoal</span>
+          </button>
+
+          <button class="category-card" data-category="academico">
+            <span class="category-card__icon">🎓</span>
+            <span class="category-card__label">Acadêmico</span>
+          </button>
+
+          <button class="category-card" data-category="trabalho">
+            <span class="category-card__icon">💼</span>
+            <span class="category-card__label">Trabalho</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- Estado inicial / Empty state -->
+      <section class="empty-state container" id="empty-state">
+        <div class="empty-state__icon">📂</div>
+        <p class="empty-state__title">Você ainda não adicionou arquivos</p>
+        <p class="empty-state__subtitle">
+          Comece enviando um documento ou escolha uma categoria
+        </p>
+        <button id="btn-empty-state-add" type="button" class="btn btn-primary">
+          + Adicionar arquivo
+        </button>
+      </section>
+
+      <!-- Resumo de arquivos (exibido quando há itens salvos) -->
+      <div class="home-files-summary container is-hidden" id="home-files-summary">
+        <p class="home-summary__text"></p>
+      </div>
+
+    </div><!-- /screen-home -->
+
+    <!-- ===== TELA 2: UPLOAD E NOMEAÇÃO ===== -->
+    <section id="upload-screen" class="screen upload-screen is-hidden">
+
+      <!-- Header -->
+      <header class="upload-header">
+        <div class="container">
+          <span class="logo">Cadê?</span>
+        </div>
+      </header>
+
+      <!-- Conteúdo principal -->
+      <main class="upload-main container">
+
+        <!-- Intro -->
+        <div class="upload-intro">
+          <h1 class="upload-intro__title" id="upload-intro-title">Adicionar arquivo</h1>
+          <p class="upload-intro__subtitle" id="upload-intro-subtitle">
+            Envie um documento e organize-o por categoria
+          </p>
+        </div>
+
+        <!-- Card do formulário -->
+        <form id="upload-form" novalidate>
+        <div class="upload-card">
+
+          <!-- Área de upload -->
+          <div class="form-group" id="upload-area-wrapper">
+            <label class="upload-area" id="upload-area" for="upload-input">
+              <input
+                type="file"
+                id="upload-input"
+                class="upload-input"
+                accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,image/*"
+              />
+
+              <div class="upload-area__content" id="upload-content">
+                <span class="upload-area__icon">📎</span>
+                <span class="upload-area__text">Toque ou clique para selecionar um arquivo</span>
+                <span class="upload-area__hint">PDF, imagem ou documento</span>
+              </div>
+            </label>
+          </div>
+
+          <span class="field-error" id="error-file"></span>
+
+          <!-- Nome do arquivo -->
+          <div class="form-group">
+            <label class="form-label" for="file-name">Nome do arquivo</label>
+            <input
+              type="text"
+              id="file-name"
+              class="form-input"
+              placeholder="Comprovante de residência 2026"
+            />
+          </div>
+
+          <span class="field-error" id="error-name"></span>
+
+          <!-- Categoria -->
+          <div class="form-group">
+            <span class="form-label">Categoria</span>
+
+            <div class="category-options">
+              <button type="button" class="category-option" data-category="pessoal">🏠 Pessoal</button>
+              <button type="button" class="category-option" data-category="academico">🎓 Acadêmico</button>
+              <button type="button" class="category-option" data-category="trabalho">💼 Trabalho</button>
+            </div>
+          </div>
+
+          <span class="field-error" id="error-category"></span>
+
+          <!-- Etiqueta opcional -->
+          <div class="form-group">
+            <label class="form-label" for="file-tag">
+              Etiqueta <span class="form-label--optional">(opcional)</span>
+            </label>
+
+            <input
+              type="text"
+              id="file-tag"
+              class="form-input"
+              placeholder="CNH, contrato, currículo..."
+            />
+          </div>
+
+        </div>
+
+        <!-- Ações -->
+        <div class="upload-actions">
+          <button id="btn-back" type="button" class="btn btn-secondary btn-full">
+            Voltar
+          </button>
+        </div>
+
+        </form>
+
+        <!-- Painel deSUCESSO -->
+        <div class="upload-success-panel is-hidden" id="upload-success-panel">
+          <div class="upload-success-panel__icon">✅</div>
+          <h2>Arquivo adicionado com sucesso</h2>
+
+          <div class="upload-success-panel__actions">
+            <button id="btn-success-view-files" class="btn btn-primary btn-full">
+              Ver arquivos
+            </button>
+
+            <button id="btn-success-add-another" class="btn btn-secondary btn-full">
+              Adicionar outro
+            </button>
+          </div>
+        </div>
+
+      </main>
+    </section>
+
+    <!-- ===== TELA 3: VISUALIZAÇÃO POR CATEGORIA ===== -->
+    <section id="category-screen" class="screen category-screen is-hidden">
+
+      <!-- Header -->
+      <header class="category-header">
+        <div class="container">
+          <span class="logo">Cadê?</span>
+        </div>
+      </header>
+
+      <!-- Conteúdo principal -->
+      <main class="category-main container">
+
+        <nav>
+          <button id="btn-category-back" class="btn-back-link">← Voltar</button>
+        </nav>
+
+        <h1>Arquivos por categoria</h1>
+
+        <div class="category-summary">
+          <span id="category-summary-icon">🏠</span>
+          <span id="category-summary-label">Pessoal</span>
+          <span id="category-summary-count"></span>
+        </div>
+
+        <div class="category-toolbar">
+          <input
+            type="search"
+            id="category-filter-input"
+            placeholder="Filtrar nesta categoria"
+          />
+
+          <select id="sort-select">
+            <option value="recent">Mais recentes</option>
+            <option value="name">Nome A-Z</option>
+            <option value="type">Tipo</option>
+          </select>
+        </div>
+
+        <div id="file-list" class="file-list"></div>
+        <div id="duplicate-alert" class="duplicate-alert is-hidden">
+          ⚠️ Arquivo duplicado 
+        </div>
+
+      </main>
+    </section>
+
+    <!-- ===== TELA 4: RESULTADO DA BUSCA ===== -->
+    <section id="search-results-screen" class="screen search-results-screen is-hidden">
+
+      <header>
+        <span class="logo">Cadê?</span>
+      </header>
+
+      <main class="container">
+
+        <button id="btn-search-back" class="btn-back-link">← Voltar</button>
+
+        <h1>Resultado da busca</h1>
+
+        <input
+          type="search"
+          id="results-search-input"
+          placeholder="Buscar arquivos"
+        />
+
+        <div id="search-results-list"></div>
+
+      </main>
+    </section>
+
+    <!-- Modal exclusão -->
+    <div id="delete-modal" class="delete-modal is-hidden">
+      <div class="delete-modal__box">
+        <p>Excluir arquivo?</p>
+        <strong id="delete-modal-name"></strong>
+
+        <button id="btn-delete-cancel">Cancelar</button>
+        <button id="btn-delete-confirm">Excluir</button>
+      </div>
+    </div>
+
+    <!-- JS -->
+    <script src="src/js/main.js"></script>
+  </body>
+</html>

@@ -528,3 +528,52 @@
   gap: var(--space-3);
   width: 100%;
 }
+
+/* Search ativo (quando usuário foca ou digita) */
+.search-bar.is-active {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(255, 204, 0, 0.18);
+}
+
+/* Categoria ativa (home/upload) */
+.category-card.is-active {
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-md);
+}
+
+/* Estado duplicado (alerta visual) */
+.duplicate-alert {
+  background-color: #FEF3C7;
+  border: 1.5px solid #F59E0B;
+  color: #92400E;
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  margin-bottom: var(--space-4);
+}
+
+/* Badge de novidade/realce */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  background-color: var(--color-primary);
+  color: var(--color-secondary);
+}
+
+/* Estado vazio mais forte (opcional melhoria UX) */
+.empty-state__icon,
+.empty-results-state__icon,
+.empty-filter-state__icon {
+  opacity: 0.8;
+}
+
+/* Micro interação global cards */
+.file-card,
+.result-card,
+.category-card {
+  will-change: transform;
+}
