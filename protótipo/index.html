@@ -121,11 +121,12 @@
                 id="upload-input"
                 class="upload-input"
                 accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,image/*"
+                multiple
               />
 
               <div class="upload-area__content" id="upload-content">
                 <span class="upload-area__icon">📎</span>
-                <span class="upload-area__text">Toque ou clique para selecionar um arquivo</span>
+                <span class="upload-area__text">Toque ou clique para selecionar um ou mais arquivos</span>
                 <span class="upload-area__hint">PDF, imagem ou documento</span>
               </div>
             </label>
@@ -133,8 +134,9 @@
 
           <span class="field-error" id="error-file"></span>
 
-          <!-- Nome do arquivo -->
-          <div class="form-group">
+          <!-- Nome do arquivo (somente no modo edição; no modo adicionar a
+               nomeação acontece no fluxo de renomeação em lote) -->
+          <div class="form-group" id="name-field-group">
             <label class="form-label" for="file-name">Nome do arquivo</label>
             <input
               type="text"
@@ -315,6 +317,40 @@
         <div class="delete-modal__actions">
           <button id="btn-delete-cancel" class="btn btn-secondary">Cancelar</button>
           <button id="btn-delete-confirm" class="btn btn-danger">Excluir</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: decisão de renomear o lote -->
+    <div id="rename-decision-modal" class="batch-modal is-hidden" role="dialog" aria-modal="true" aria-labelledby="rename-decision-title">
+      <div class="batch-modal__box">
+        <p class="batch-modal__title" id="rename-decision-title">Deseja renomear seus arquivos?</p>
+        <p class="batch-modal__body" id="rename-decision-subtitle">
+          Você selecionou alguns arquivos. Renomeie-os agora ou mantenha os nomes originais.
+        </p>
+
+        <ul class="batch-files-preview" id="rename-decision-list"></ul>
+
+        <div class="batch-modal__actions batch-modal__actions--stacked">
+          <button id="btn-rename-yes" type="button" class="btn btn-primary btn-full">Sim, renomear</button>
+          <button id="btn-rename-no" type="button" class="btn btn-secondary btn-full">Não, manter nomes originais</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: lista de renomeação por arquivo -->
+    <div id="rename-list-modal" class="batch-modal is-hidden" role="dialog" aria-modal="true" aria-labelledby="rename-list-title">
+      <div class="batch-modal__box batch-modal__box--lg">
+        <p class="batch-modal__title" id="rename-list-title">Renomear arquivos</p>
+        <p class="batch-modal__body">
+          Edite o nome de cada arquivo. A extensão é mantida automaticamente; campos em branco voltam ao nome original.
+        </p>
+
+        <div class="rename-list" id="rename-list"></div>
+
+        <div class="batch-modal__actions">
+          <button id="btn-rename-cancel" type="button" class="btn btn-secondary">Voltar</button>
+          <button id="btn-rename-save" type="button" class="btn btn-primary">Salvar arquivos</button>
         </div>
       </div>
     </div>

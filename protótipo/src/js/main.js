@@ -36,6 +36,11 @@ let lastSearchTerm = '';
 let lastSavedCategory = null;
 let pendingDeleteId = null;
 
+// Estado do upload em lote (modo adicionar)
+let batchFiles = [];              // File[] selecionados no seletor nativo
+let batchRowCategories = [];      // categoria escolhida por arquivo (modal "Sim")
+let batchDefaultCategory = null;  // categoria clicada na Tela 2 (default do lote)
+
 // ===============================
 // INDEXEDDB
 // ===============================
@@ -122,6 +127,60 @@ function detectFileMeta(file) {
     isImage,
     mimeType: file.type || '',
   };
+}
+
+// ===============================
+// NOME / EXTENSÃO / DEDUPLICAÇÃO (upload em lote)
+// ===============================
+
+// Separa o nome de um arquivo em { base, ext }, usando o último ponto.
+// A extensão preserva o caso original e só é considerada quando parece
+// uma extensão real (até 10 caracteres alfanuméricos). Dotfiles e nomes
+// sem ponto devolvem ext vazia.
+function splitName(filename = '') {
+  const name = String(filename ?? '');
+  const lastDot = name.lastIndexOf('.');
+
+  if (lastDot > 0) {
+    const ext = name.slice(lastDot + 1);
+    if (/^[A-Za-z0-9]{1,10}$/.test(ext)) {
+      return { base: name.slice(0, lastDot), ext };
+    }
+  }
+
+  return { base: name, ext: '' };
+}
+
+// Reconstrói o nome de exibição a partir de base + extensão.
+// Faz trim do nome-base e mantém a extensão original quando existir.
+function buildDisplayName(base = '', ext = '') {
+  const b = String(base ?? '').trim();
+  return ext ? `${b}.${ext}` : b;
+}
+
+// Garante nomes únicos num lote (case-insensitive). Em caso de colisão,
+// insere um sufixo numérico ANTES da extensão: arquivo, arquivo 1, ...
+// `existingNames` permite evitar também colisão com itens já salvos.
+function dedupeBatchNames(names = [], existingNames = []) {
+  const key = (n) => String(n ?? '').trim().toLowerCase();
+  const taken = new Set(existingNames.map(key));
+  const result = [];
+
+  for (const name of names) {
+    const { base, ext } = splitName(name);
+    let candidate = name;
+    let n = 1;
+
+    while (taken.has(key(candidate))) {
+      candidate = buildDisplayName(`${base} ${n}`, ext);
+      n++;
+    }
+
+    taken.add(key(candidate));
+    result.push(candidate);
+  }
+
+  return result;
 }
 
 // Marca arquivos atualizados há menos de 48h (destaque visual — spec).
@@ -259,6 +318,34 @@ function addFile(record) {
     };
 
     req.onerror = (e) => reject(e.target.error);
+  });
+}
+
+// Adiciona vários registros numa única transação (upload em lote).
+// Reaproveita o mesmo shape de addFile (id/createdAt/updatedAt).
+function saveBatch(records) {
+  return new Promise((resolve, reject) => {
+    if (!records || !records.length) return resolve([]);
+
+    const tx = db.transaction(STORE_NAME, 'readwrite');
+    const store = tx.objectStore(STORE_NAME);
+    const now = new Date().toISOString();
+    const saved = [];
+
+    for (const record of records) {
+      const data = {
+        id: generateId(),
+        ...record,
+        createdAt: now,
+        updatedAt: now,
+      };
+      store.add(data);
+      saved.push(data);
+    }
+
+    tx.oncomplete = () => resolve(saved);
+    tx.onerror = (e) => reject(e.target.error);
+    tx.onabort = (e) => reject((e.target && e.target.error) || new Error('Transação abortada'));
   });
 }
 
@@ -557,20 +644,28 @@ function showUploadForm() {
   if (panel) panel.classList.add('is-hidden');
 }
 
-// Abre a Tela 2 em modo "adicionar".
+// Mostra/oculta o campo único "Nome do arquivo" (usado só na edição).
+function setNameFieldVisible(visible) {
+  const group = document.getElementById('name-field-group');
+  if (group) group.classList.toggle('is-hidden', !visible);
+}
+
+// Abre a Tela 2 em modo "adicionar" (upload em lote).
 function openAdd() {
   editingId = null;
   selectedFileObj = null;
   selectedCategory = null;
+  resetBatchState();
 
-  setText('upload-intro-title', 'Adicionar arquivo');
-  setText('upload-intro-subtitle', 'Envie um documento e organize-o por categoria');
+  setText('upload-intro-title', 'Adicionar arquivos');
+  setText('upload-intro-subtitle', 'Envie um ou mais documentos e organize-os por categoria');
 
   const nameInput = document.getElementById('file-name');
   const tagInput = document.getElementById('file-tag');
   if (nameInput) nameInput.value = '';
   if (tagInput) tagInput.value = '';
 
+  setNameFieldVisible(false);   // a nomeação acontece no fluxo de renomeação
   resetUploadContent();
   markCategorySelection(null);
   clearUploadErrors();
@@ -588,9 +683,12 @@ function openEdit(id) {
   editingId = id;
   selectedFileObj = null;            // só muda o arquivo se o usuário escolher um novo
   selectedCategory = file.category;
+  resetBatchState();
 
   setText('upload-intro-title', 'Editar arquivo');
   setText('upload-intro-subtitle', 'Altere as informações e escolha a categoria para salvar');
+
+  setNameFieldVisible(true);         // edição continua usando o campo único de nome
 
   const nameInput = document.getElementById('file-name');
   const tagInput = document.getElementById('file-tag');
@@ -607,11 +705,26 @@ function openEdit(id) {
 }
 
 function onFileSelected(e) {
-  const file = e.target.files && e.target.files[0];
-  if (!file) return;
+  const files = e.target.files ? Array.from(e.target.files) : [];
+  if (!files.length) return;
 
-  selectedFileObj = file;
-  setUploadContentSelected(file.name, 'Toque para trocar o arquivo');
+  if (editingId) {
+    // Edição: substitui por um único arquivo (mantém o fluxo atual).
+    selectedFileObj = files[0];
+    setUploadContentSelected(files[0].name, 'Arquivo atual — toque para substituir');
+  } else {
+    // Adição: guarda o lote selecionado.
+    batchFiles = files;
+    if (files.length === 1) {
+      setUploadContentSelected(files[0].name, 'Toque para trocar os arquivos');
+    } else {
+      setUploadContentSelected(
+        `${files.length} arquivos selecionados`,
+        'Toque para trocar a seleção'
+      );
+    }
+  }
+
   setFieldError('error-file', '');
   const area = document.getElementById('upload-area');
   if (area) area.classList.remove('is-error');
@@ -624,11 +737,17 @@ function onNameInput() {
   else hideSimilarAlert();
 }
 
-// Clique numa categoria -> seleciona e tenta salvar (auto-save).
+// Clique numa categoria. Na edição mantém o auto-save single-file; na
+// adição é o gatilho de envio do lote (abre a pergunta de renomeação).
 function onCategoryClick(catKey) {
   selectedCategory = catKey;
   markCategorySelection(catKey);
-  trySave();
+
+  if (editingId) {
+    trySave();
+  } else {
+    startBatchSubmit(catKey);
+  }
 }
 
 async function trySave() {
@@ -698,6 +817,184 @@ function showSuccess(mode, file) {
     mode === 'edit'
       ? 'As alterações foram salvas. Você já pode vê-las na lista.'
       : 'Seu arquivo foi salvo e já pode ser encontrado na busca.');
+
+  const form = document.getElementById('upload-form');
+  const panel = document.getElementById('upload-success-panel');
+  if (form) form.classList.add('is-hidden');
+  if (panel) panel.classList.remove('is-hidden');
+
+  hideSimilarAlert();
+  refreshHome();
+}
+
+// ===============================
+// TELA 2 — UPLOAD EM LOTE (múltiplos arquivos + renomeação)
+// ===============================
+
+function resetBatchState() {
+  batchFiles = [];
+  batchRowCategories = [];
+  batchDefaultCategory = null;
+  const input = document.getElementById('upload-input');
+  if (input) input.value = '';
+}
+
+// --- helpers de modal genéricos ---
+function showModal(id) {
+  const el = document.getElementById(id);
+  if (el) el.classList.remove('is-hidden');
+}
+
+function hideModal(id) {
+  const el = document.getElementById(id);
+  if (el) el.classList.add('is-hidden');
+}
+
+function closeBatchModals() {
+  hideModal('rename-decision-modal');
+  hideModal('rename-list-modal');
+}
+
+// Gatilho de envio na adição: valida a seleção e pergunta sobre renomear.
+function startBatchSubmit(catKey) {
+  batchDefaultCategory = catKey;
+  clearUploadErrors();
+
+  if (!batchFiles.length) {
+    setFieldError('error-file', 'Selecione um ou mais arquivos para continuar.');
+    const area = document.getElementById('upload-area');
+    if (area) area.classList.add('is-error');
+    return;
+  }
+
+  openRenameDecision();
+}
+
+// Pergunta "Deseja renomear seus arquivos?".
+function openRenameDecision() {
+  const n = batchFiles.length;
+
+  setText('rename-decision-subtitle',
+    n === 1
+      ? 'Você selecionou 1 arquivo. Renomeie-o agora ou mantenha o nome original.'
+      : `Você selecionou ${n} arquivos. Renomeie-os agora ou mantenha os nomes originais.`);
+
+  const list = document.getElementById('rename-decision-list');
+  if (list) {
+    list.innerHTML = batchFiles
+      .map(f => `<li class="batch-files-preview__item">${escapeHtml(f.name)}</li>`)
+      .join('');
+  }
+
+  showModal('rename-decision-modal');
+}
+
+// "Não": salva todos com os nomes originais e a categoria padrão do lote.
+function saveBatchKeepNames() {
+  hideModal('rename-decision-modal');
+  const names = batchFiles.map(f => f.name);
+  const categories = batchFiles.map(() => batchDefaultCategory);
+  commitBatch(buildBatchRecords(names, categories));
+}
+
+// "Sim": abre a lista de renomeação (nome-base + extensão + categoria por arquivo).
+function openRenameList() {
+  hideModal('rename-decision-modal');
+  batchRowCategories = batchFiles.map(() => batchDefaultCategory);
+  renderRenameList();
+  showModal('rename-list-modal');
+}
+
+function renderRenameList() {
+  const container = document.getElementById('rename-list');
+  if (!container) return;
+
+  container.innerHTML = batchFiles.map((file, i) => {
+    const { base, ext } = splitName(file.name);
+    const extChip = ext ? `<span class="rename-row__ext">.${escapeHtml(ext)}</span>` : '';
+
+    const cats = Object.keys(CATEGORIES).map(key => {
+      const c = CATEGORIES[key];
+      const sel = batchRowCategories[i] === key ? ' is-selected' : '';
+      return `<button type="button" class="category-option category-option--mini${sel}" data-row="${i}" data-category="${key}">${c.icon} ${escapeHtml(c.label)}</button>`;
+    }).join('');
+
+    return `
+      <div class="rename-row" data-index="${i}">
+        <span class="rename-row__original" title="${escapeHtml(file.name)}">Original: ${escapeHtml(file.name)}</span>
+        <div class="rename-row__name">
+          <div class="form-input-wrapper rename-row__field">
+            <input type="text" class="form-input rename-row__input" data-row="${i}" value="${escapeHtml(base)}" placeholder="${escapeHtml(base)}" aria-label="Novo nome para ${escapeHtml(file.name)}" />
+          </div>
+          ${extChip}
+        </div>
+        <div class="rename-row__categories">${cats}</div>
+      </div>`;
+  }).join('');
+}
+
+// Lê os campos da lista, monta os registros e salva.
+function confirmBatchSave() {
+  const container = document.getElementById('rename-list');
+
+  const names = batchFiles.map((file, i) => {
+    const { base, ext } = splitName(file.name);
+    const input = container
+      ? container.querySelector(`.rename-row__input[data-row="${i}"]`)
+      : null;
+    const edited = input ? input.value.trim() : '';
+    const finalBase = edited || base;       // campo vazio -> nome original (fallback)
+    return buildDisplayName(finalBase, ext);
+  });
+
+  const categories = batchFiles.map((_, i) => batchRowCategories[i] || batchDefaultCategory);
+
+  hideModal('rename-list-modal');
+  commitBatch(buildBatchRecords(names, categories));
+}
+
+// Monta os registros do lote: deduplica nomes e preserva metadados.
+function buildBatchRecords(desiredNames, categories) {
+  const tag = ((document.getElementById('file-tag') || {}).value || '').trim();
+  const existing = cache.map(f => f.displayName);
+  const finalNames = dedupeBatchNames(desiredNames, existing);
+
+  return batchFiles.map((file, i) => ({
+    displayName: finalNames[i],
+    originalFileName: finalNames[i],
+    tag,
+    category: categories[i],
+    blob: file,
+    ...detectFileMeta(file),
+  }));
+}
+
+// Persiste o lote, atualiza o cache e mostra o painel de sucesso.
+async function commitBatch(records) {
+  if (!records.length) return;
+
+  try {
+    const saved = await saveBatch(records);
+    await getAllFiles();
+
+    const cats = [...new Set(records.map(r => r.category))];
+    showBatchSuccess(saved.length, cats.length === 1 ? cats[0] : null);
+    resetBatchState();
+  } catch (err) {
+    console.error('[Cadê?] Erro ao salvar lote:', err);
+    setFieldError('error-file', 'Não foi possível salvar os arquivos. Tente novamente.');
+  }
+}
+
+function showBatchSuccess(count, category) {
+  lastSavedCategory = category || null;
+
+  setText('upload-success-title',
+    count === 1 ? 'Arquivo adicionado com sucesso' : `${count} arquivos adicionados com sucesso`);
+  setText('upload-success-subtitle',
+    count === 1
+      ? 'Seu arquivo foi salvo e já pode ser encontrado na busca.'
+      : 'Seus arquivos foram salvos e já podem ser encontrados na busca.');
 
   const form = document.getElementById('upload-form');
   const panel = document.getElementById('upload-success-panel');
@@ -968,6 +1265,40 @@ function bindEvents() {
     });
   }
 
+  // --- Modais do upload em lote (renomeação) ---
+  on('btn-rename-yes', 'click', openRenameList);
+  on('btn-rename-no', 'click', saveBatchKeepNames);
+  on('btn-rename-save', 'click', confirmBatchSave);
+  on('btn-rename-cancel', 'click', () => {
+    hideModal('rename-list-modal');
+    showModal('rename-decision-modal');     // "Voltar" reabre a pergunta
+  });
+
+  // Seleção de categoria por arquivo (delegação dentro da lista)
+  const renameList = document.getElementById('rename-list');
+  if (renameList) {
+    renameList.addEventListener('click', (e) => {
+      const btn = e.target.closest('.category-option[data-row]');
+      if (!btn) return;
+      const row = Number(btn.dataset.row);
+      batchRowCategories[row] = btn.dataset.category;
+      renameList.querySelectorAll(`.category-option[data-row="${row}"]`).forEach(b => {
+        b.classList.toggle('is-selected', b.dataset.category === btn.dataset.category);
+      });
+    });
+  }
+
+  // Clicar fora fecha o modal de lote (cancela, mantendo a seleção)
+  ['rename-decision-modal', 'rename-list-modal'].forEach(id => {
+    const m = document.getElementById(id);
+    if (m) m.addEventListener('click', (e) => { if (e.target === m) hideModal(id); });
+  });
+
+  // Esc fecha os modais de lote
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeBatchModals();
+  });
+
   // --- Delegação: ações dos cards (abrir/editar/excluir) ---
   document.addEventListener('click', (e) => {
     const btn = e.target.closest('[data-action]');
@@ -1004,4 +1335,12 @@ async function init() {
   console.log('[Cadê?] Ready ✔️');
 }
 
-init();
+// Só inicializa a UI em ambiente de navegador. Em Node (testes de lógica)
+// apenas exportamos os helpers puros.
+if (typeof document !== 'undefined') {
+  init();
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = { splitName, buildDisplayName, dedupeBatchNames };
+}

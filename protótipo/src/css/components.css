@@ -474,6 +474,146 @@
   padding-block: var(--space-3);
 }
 
+/* --- Modais do upload em lote (renomeação) --- */
+.batch-modal {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(15, 23, 42, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: var(--space-4);
+  backdrop-filter: blur(2px);
+}
+
+.batch-modal__box {
+  background-color: var(--color-white);
+  border-radius: var(--radius-2xl);
+  padding: var(--space-6);
+  max-width: 360px;
+  width: 100%;
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.batch-modal__box--lg {
+  max-width: 520px;
+}
+
+.batch-modal__title {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+}
+
+.batch-modal__body {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+}
+
+.batch-modal__actions {
+  display: flex;
+  gap: var(--space-3);
+}
+
+.batch-modal__actions .btn {
+  flex: 1;
+  padding-block: var(--space-3);
+}
+
+.batch-modal__actions--stacked {
+  flex-direction: column;
+}
+
+/* Prévia dos arquivos selecionados (modal de decisão) */
+.batch-files-preview {
+  list-style: none;
+  margin: 0;
+  padding: var(--space-3);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  max-height: 180px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.batch-files-preview__item {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-primary);
+  word-break: break-all;
+}
+
+/* Lista de renomeação */
+.rename-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  max-height: 55vh;
+  overflow-y: auto;
+  padding-right: var(--space-1);
+}
+
+.rename-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-surface);
+}
+
+.rename-row__original {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  word-break: break-all;
+}
+
+.rename-row__name {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.rename-row__field {
+  flex: 1;
+  background-color: var(--color-white);
+  padding: var(--space-2) var(--space-3);
+}
+
+.rename-row__ext {
+  flex-shrink: 0;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-secondary);
+  background-color: var(--color-border);
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+}
+
+.rename-row__categories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+/* Botão de categoria compacto (uma por arquivo na lista) */
+.category-option--mini {
+  flex: 1 1 auto;
+  flex-direction: row;
+  justify-content: center;
+  gap: var(--space-1);
+  padding: var(--space-2) var(--space-2);
+  font-size: var(--font-size-xs);
+}
+
 /* --- Resumo de arquivos na Tela Inicial --- */
 .home-files-summary {
   padding-inline: var(--space-4);
