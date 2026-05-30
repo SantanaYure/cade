@@ -14,13 +14,8 @@
 
   <body>
 
-    <!-- ALERTA DUPLICIDADE -->
-    <div id="duplicate-alert" class="duplicate-alert is-hidden" role="alert">
-      ⚠️ Já existe um arquivo com esse nome
-    </div>
-
     <!-- ===== TELA INICIAL ===== -->
-    <div class="screen screen-home">
+    <div class="screen screen-home" id="home-screen">
 
       <!-- Header -->
       <header class="home-header">
@@ -151,6 +146,11 @@
 
           <span class="field-error" id="error-name"></span>
 
+          <!-- Aviso de nome parecido (detecção de duplicidade) -->
+          <div id="duplicate-alert" class="duplicate-alert is-hidden" role="alert">
+            ⚠️ Já existe um arquivo com nome parecido
+          </div>
+
           <!-- Categoria -->
           <div class="form-group">
             <span class="form-label">Categoria</span>
@@ -189,10 +189,13 @@
 
         </form>
 
-        <!-- Painel deSUCESSO -->
+        <!-- Painel de SUCESSO -->
         <div class="upload-success-panel is-hidden" id="upload-success-panel">
           <div class="upload-success-panel__icon">✅</div>
-          <h2>Arquivo adicionado com sucesso</h2>
+          <h2 class="upload-success-panel__title" id="upload-success-title">Arquivo adicionado com sucesso</h2>
+          <p class="upload-success-panel__subtitle" id="upload-success-subtitle">
+            Seu arquivo foi salvo e já pode ser encontrado na busca.
+          </p>
 
           <div class="upload-success-panel__actions">
             <button id="btn-success-view-files" class="btn btn-primary btn-full">
@@ -225,32 +228,39 @@
           <button id="btn-category-back" class="btn-back-link">← Voltar</button>
         </nav>
 
-        <h1>Arquivos por categoria</h1>
+        <h1 class="category-intro__title">Arquivos por categoria</h1>
 
         <div class="category-summary">
-          <span id="category-summary-icon">🏠</span>
-          <span id="category-summary-label">Pessoal</span>
-          <span id="category-summary-count"></span>
+          <span class="category-summary__icon" id="category-summary-icon">🏠</span>
+          <div class="category-summary__info">
+            <span class="category-summary__label" id="category-summary-label">Pessoal</span>
+            <span class="category-summary__count" id="category-summary-count"></span>
+          </div>
         </div>
 
         <div class="category-toolbar">
-          <input
-            type="search"
-            id="category-filter-input"
-            placeholder="Filtrar nesta categoria"
-          />
+          <div class="form-input-wrapper category-filter">
+            <input
+              type="search"
+              id="category-filter-input"
+              class="form-input"
+              placeholder="Filtrar nesta categoria"
+            />
+          </div>
 
-          <select id="sort-select">
-            <option value="recent">Mais recentes</option>
-            <option value="name">Nome A-Z</option>
-            <option value="type">Tipo</option>
-          </select>
+          <div class="sort-group">
+            <label class="form-label" for="sort-select">Ordenar por</label>
+            <div class="sort-select-wrapper">
+              <select id="sort-select" class="sort-select">
+                <option value="recent">Mais recentes</option>
+                <option value="name">Nome A-Z</option>
+                <option value="type">Tipo de arquivo</option>
+              </select>
+            </div>
+          </div>
         </div>
 
         <div id="file-list" class="file-list"></div>
-        <div id="duplicate-alert" class="duplicate-alert is-hidden">
-          ⚠️ Arquivo duplicado 
-        </div>
 
       </main>
     </section>
@@ -258,35 +268,54 @@
     <!-- ===== TELA 4: RESULTADO DA BUSCA ===== -->
     <section id="search-results-screen" class="screen search-results-screen is-hidden">
 
-      <header>
-        <span class="logo">Cadê?</span>
+      <header class="search-results-header">
+        <div class="container">
+          <span class="logo">Cadê?</span>
+        </div>
       </header>
 
-      <main class="container">
+      <main class="search-results-main container">
 
-        <button id="btn-search-back" class="btn-back-link">← Voltar</button>
+        <nav class="search-results-nav">
+          <button id="btn-search-back" class="btn-back-link">← Voltar</button>
+        </nav>
 
-        <h1>Resultado da busca</h1>
+        <div class="search-results-intro">
+          <h1 class="search-results-intro__title">Resultado da busca</h1>
+        </div>
 
-        <input
-          type="search"
-          id="results-search-input"
-          placeholder="Buscar arquivos"
-        />
+        <form id="results-search-form" class="results-search-form">
+          <div class="results-search-field">
+            <input
+              type="search"
+              id="results-search-input"
+              class="results-search-input"
+              placeholder="Buscar arquivos"
+            />
+          </div>
+          <button type="submit" class="btn btn-primary results-search-btn">Buscar</button>
+        </form>
 
-        <div id="search-results-list"></div>
+        <div id="search-results-feedback"></div>
+
+        <div id="search-results-list" class="search-results-list"></div>
 
       </main>
     </section>
 
     <!-- Modal exclusão -->
-    <div id="delete-modal" class="delete-modal is-hidden">
+    <div id="delete-modal" class="delete-modal is-hidden" role="dialog" aria-modal="true">
       <div class="delete-modal__box">
-        <p>Excluir arquivo?</p>
-        <strong id="delete-modal-name"></strong>
+        <p class="delete-modal__title">Excluir arquivo?</p>
+        <p class="delete-modal__body">
+          Tem certeza que deseja excluir <strong id="delete-modal-name"></strong>?
+          Essa ação não pode ser desfeita.
+        </p>
 
-        <button id="btn-delete-cancel">Cancelar</button>
-        <button id="btn-delete-confirm">Excluir</button>
+        <div class="delete-modal__actions">
+          <button id="btn-delete-cancel" class="btn btn-secondary">Cancelar</button>
+          <button id="btn-delete-confirm" class="btn btn-danger">Excluir</button>
+        </div>
       </div>
     </div>
 
